@@ -5,4 +5,5 @@
   <color name="colorAccent">#1de9b6</color>
   <color name="boring_header_text">#aa000000</color>
   <color name="boring_header_background">#dcdcdc</color>
+  <color name="boring_divider">#46000000</color>
 </resources>
