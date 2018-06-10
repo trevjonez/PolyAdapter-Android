@@ -10,6 +10,10 @@ import com.trevjonez.polyadapter.diffutil.CancelDiffException
 import com.trevjonez.polyadapter.diffutil.MainThread
 import java.util.concurrent.Executor
 
+/**
+ * Implementation translated from [AsyncPagedListDiffer]
+ * It differs in that we eagerly check and abort diffing if new updates come in while running diffs.
+ */
 class PolyPagedListProvider(
     private val paddingItem: Any = Unit,
     private val backgroundExecutor: Executor = BackgroundPool,

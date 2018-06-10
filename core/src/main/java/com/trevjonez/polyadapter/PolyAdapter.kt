@@ -1,5 +1,6 @@
 package com.trevjonez.polyadapter
 
+import android.arch.paging.PagedList
 import android.support.annotation.LayoutRes
 import android.support.v4.util.SimpleArrayMap
 import android.support.v7.util.DiffUtil
@@ -7,8 +8,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.trevjonez.polyadapter.providers.PolyListItemProvider
+import com.trevjonez.polyadapter.providers.PolyPagedListProvider
 
-class PolyAdapter(private val itemProvider: ItemProvider) :
+class PolyAdapter(val itemProvider: ItemProvider) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
   private val layoutIdRegistry = SimpleArrayMap<Int, BindingDelegate<*, *>>()
   private val classTypeRegistry = SimpleArrayMap<Class<*>, BindingDelegate<*, *>>()
@@ -177,4 +180,23 @@ class PolyAdapter(private val itemProvider: ItemProvider) :
 
   private fun BindingDelegate<Any, RecyclerView.ViewHolder>.asViewDetachedDelegate() =
       asType<OnViewDetachedDelegate<RecyclerView.ViewHolder>>()
+}
+
+/**
+ *
+ */
+fun PolyAdapter.updateList(items: List<Any>) {
+  (itemProvider as? PolyListItemProvider)?.updateList(items)
+      ?: throw UnsupportedOperationException(
+          "itemProvider was type ${itemProvider.javaClass.simpleName} " +
+              "but expected ${PolyListItemProvider::class.java.simpleName}"
+      )
+}
+
+fun PolyAdapter.updatePagedList(items: PagedList<Any>) {
+  (itemProvider as? PolyPagedListProvider)?.updateList(items)
+      ?: throw UnsupportedOperationException(
+          "itemProvider was type ${itemProvider.javaClass.simpleName} " +
+              "but expected ${PolyPagedListProvider::class.java.simpleName}"
+      )
 }

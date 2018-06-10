@@ -14,12 +14,12 @@ import com.trevjonez.polyadapter.sample.data.Movie
 import com.trevjonez.polyadapter.sample.delegates.CategoryDelegate
 import com.trevjonez.polyadapter.sample.delegates.DividerDelegate
 import com.trevjonez.polyadapter.sample.delegates.MovieDelegate
+import com.trevjonez.polyadapter.updateList
 
 class SampleActivity : AppCompatActivity() {
 
   private lateinit var viewBinding: SampleActivityBinding
-  private val itemProvider = PolyListItemProvider()
-  private val polyAdapter = PolyAdapter(itemProvider).apply {
+  private val polyAdapter = PolyAdapter(PolyListItemProvider()).apply {
     addDelegate(CategoryDelegate())
     addDelegate(DividerDelegate())
     addDelegate(MovieDelegate())
@@ -34,7 +34,7 @@ class SampleActivity : AppCompatActivity() {
       adapter = polyAdapter
     }
 
-    itemProvider.updateList(listOf(
+    polyAdapter.updateList(listOf(
         CategoryTitle("The Hobbit"),
         Movie("An Unexpected Journey",
             "https://www.imdb.com/title/tt0903624/",
