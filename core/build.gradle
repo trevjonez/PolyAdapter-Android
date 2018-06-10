@@ -1,13 +1,17 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'digital.wup.android-maven-publish'
+
+group = rootProject.group
+version = rootProject.version
 
 android {
     compileSdkVersion 27
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 27
-//    versionCode 1
-//    versionName "1.0"
+        versionName = project.version
     }
 }
 
@@ -19,4 +23,57 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
 
     testImplementation('junit:junit:4.12')
+}
+
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "sources"
+}
+
+publishing {
+    repositories {
+        maven {
+            url
+        }
+    }
+    publications {
+        mavenAar(MavenPublication) {
+//            artifact(bundleRelease)
+            from components.android
+            artifact(sourceJar)
+
+            pom {
+                name = 'core'
+                description = 'Multiple item/view type recycler view adapter'
+                url = 'https://github.com/trevjonez/PolyAdapter-Android'
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'TrevJonez'
+                        name = 'Trevor Jones'
+                        email = 'trevorjones141@gmail.com'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:git@github.com:trevjonez/PolyAdapter-Android.git'
+                    developerConnection = 'scm:git:git@github.com:trevjonez/PolyAdapter-Android.git'
+                    url = 'https://github.com/trevjonez/PolyAdapter-Android'
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    user = project.findProperty('bintray_user')
+    key = project.findProperty('bintray_api_key')
+    publications = ['mavenAar']
 }
