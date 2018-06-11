@@ -12,6 +12,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 27
         versionName = project.version
+        consumerProguardFiles 'proguard-rules.pro'
     }
 }
 
