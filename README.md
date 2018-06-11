@@ -6,7 +6,7 @@ Yet another recycler view adapter library that claims to be the last you will ev
 
 ## Installation
 
-Available via jcenter(pending still):
+Available via jcenter:
 
 ```groovy
 implementation 'com.trevjonez.polyadapter:core:0.1.0'
