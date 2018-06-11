@@ -20,12 +20,28 @@ class PolyAdapter(val itemProvider: ItemProvider) :
     itemProvider.onAttach(this)
   }
 
+  /**
+   * How [PolyAdapter] gets it's items, from a [List], [PagedList], or whatever you want.
+   *
+   * @see PolyListItemProvider
+   * @see PolyPagedListProvider
+   */
   interface ItemProvider {
     fun getItemCount(): Int
     fun getItem(position: Int): Any
+
+    /**
+     * Always called once from the [PolyAdapter] init block.
+     *
+     * Allows the ItemProvider to capture a reference for change notifications
+     * without introducing a compile time cyclic dependency
+     */
     fun onAttach(adapter: PolyAdapter)
   }
 
+  /**
+   * The bare minimum properties and methods to describe the data type and view relationship.
+   */
   interface BindingDelegate<ItemType, HolderType : RecyclerView.ViewHolder> {
     @get:LayoutRes
     val layoutId: Int
@@ -35,18 +51,30 @@ class PolyAdapter(val itemProvider: ItemProvider) :
     fun bindView(holder: HolderType, item: ItemType)
   }
 
+  /**
+   * Implement on an instance of [BindingDelegate] to receive incremental bindView callbacks
+   */
   interface IncrementalBindingDelegate<in ItemType, HolderType : RecyclerView.ViewHolder> {
     fun bindView(holderType: HolderType, item: ItemType, payloads: List<Any>)
   }
 
+  /**
+   * Implement on an instance of [BindingDelegate] to receive onViewRecycled callbacks
+   */
   interface OnViewRecycledDelegate<in HolderType : RecyclerView.ViewHolder> {
     fun onRecycle(holder: HolderType)
   }
 
+  /**
+   * Implement on an instance of [BindingDelegate] to receive onViewAttached callbacks
+   */
   interface OnViewAttachedDelegate<in HolderType : RecyclerView.ViewHolder> {
     fun onAttach(holder: HolderType)
   }
 
+  /**
+   * Implement on an instance of [BindingDelegate] to receive onViewDetached callbacks
+   */
   interface OnViewDetachedDelegate<in HolderType : RecyclerView.ViewHolder> {
     fun onDetach(holder: HolderType)
   }
@@ -55,7 +83,11 @@ class PolyAdapter(val itemProvider: ItemProvider) :
 
   override fun getItemCount() = itemProvider.getItemCount()
 
+  /**
+   * Add a new delegate to this [PolyAdapter]'s lookup tables.
+   */
   fun addDelegate(delegate: BindingDelegate<*, *>) {
+    require(itemCount == 0) { "Do not modify delegate listing after supplying data to the ItemProvider"}
     val viewTypeOverwrite = layoutIdRegistry.put(delegate.layoutId, delegate)
     val dataTypeOverwrite = classTypeRegistry.put(delegate.dataType, delegate)
 
@@ -183,7 +215,7 @@ class PolyAdapter(val itemProvider: ItemProvider) :
 }
 
 /**
- *
+ * Blindly cast the itemProvider to a [PolyListItemProvider] to make list updates easier
  */
 fun PolyAdapter.updateList(items: List<Any>) {
   (itemProvider as? PolyListItemProvider)?.updateList(items)
@@ -193,6 +225,9 @@ fun PolyAdapter.updateList(items: List<Any>) {
       )
 }
 
+/**
+ * Blindly cast the itemProvider to a [PolyPagedListProvider] to make list updates easier
+ */
 fun PolyAdapter.updatePagedList(items: PagedList<Any>) {
   (itemProvider as? PolyPagedListProvider)?.updateList(items)
       ?: throw UnsupportedOperationException(
