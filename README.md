@@ -1,12 +1,12 @@
 # PolyAdapter-Android
 
-[ ![Download](https://api.bintray.com/packages/trevorjones141/maven/PolyAdapter-Android/images/download.svg?version=0.1.0) ](https://bintray.com/trevorjones141/maven/PolyAdapter-Android/0.1.0/link)
+[ ![Download](https://api.bintray.com/packages/trevorjones141/maven/PolyAdapter-Android/images/download.svg?version=0.1.0) ](https://bintray.com/trevorjones141/maven/PolyAdapter-Android/0.1.0/link) [![](https://jitpack.io/v/trevjonez/polyadapter-android.svg)](https://jitpack.io/#trevjonez/polyadapter-android)
 
 Yet another recycler view adapter library that claims to be the last you will ever need.
 
 ## Installation
 
-Available via jcenter:
+Available via [jcenter](https://bintray.com/trevorjones141/maven/PolyAdapter-Android) or [jitpack.io](https://jitpack.io/#trevjonez/polyadapter-android/0.1.0):
 
 ```groovy
 implementation 'com.trevjonez.polyadapter:core:0.1.0'
