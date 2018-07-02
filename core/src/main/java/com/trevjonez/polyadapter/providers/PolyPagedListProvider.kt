@@ -1,7 +1,6 @@
 package com.trevjonez.polyadapter.providers
 
 import android.arch.paging.*
-import android.support.v7.util.AdapterListUpdateCallback
 import android.support.v7.util.DiffUtil
 import android.support.v7.util.ListUpdateCallback
 import com.trevjonez.polyadapter.PolyAdapter
@@ -20,7 +19,7 @@ class PolyPagedListProvider(
     private val mainThreadExecutor: Executor = MainThread
 ) : PolyAdapter.ItemProvider {
 
-  private lateinit var listUpdateCallback: AdapterListUpdateCallback
+  private lateinit var listUpdateCallback: ListUpdateCallback
   private lateinit var itemCallback: DiffUtil.ItemCallback<Any>
 
   private var updateCount = 0
@@ -28,9 +27,9 @@ class PolyPagedListProvider(
   private var pagedList: PagedList<Any>? = null
   private var snapshot: PagedList<Any>? = null
 
-  override fun onAttach(adapter: PolyAdapter) {
-    listUpdateCallback = AdapterListUpdateCallback(adapter)
-    itemCallback = adapter.itemCallback
+  override fun onAttach(listUpdateCallback: ListUpdateCallback, itemCallback: DiffUtil.ItemCallback<Any>) {
+    this.listUpdateCallback = listUpdateCallback
+    this.itemCallback = itemCallback
   }
 
   override fun getItemCount(): Int {

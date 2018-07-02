@@ -3,7 +3,9 @@ package com.trevjonez.polyadapter
 import android.arch.paging.PagedList
 import android.support.annotation.LayoutRes
 import android.support.v4.util.SimpleArrayMap
+import android.support.v7.util.AdapterListUpdateCallback
 import android.support.v7.util.DiffUtil
+import android.support.v7.util.ListUpdateCallback
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -15,9 +17,10 @@ class PolyAdapter(val itemProvider: ItemProvider) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
   private val layoutIdRegistry = SimpleArrayMap<Int, BindingDelegate<*, *>>()
   private val classTypeRegistry = SimpleArrayMap<Class<*>, BindingDelegate<*, *>>()
+  private val itemCallback: DiffUtil.ItemCallback<Any> = PolyAdapterItemCallback()
 
   init {
-    itemProvider.onAttach(this)
+    itemProvider.onAttach(AdapterListUpdateCallback(this), itemCallback)
   }
 
   /**
@@ -36,7 +39,7 @@ class PolyAdapter(val itemProvider: ItemProvider) :
      * Allows the ItemProvider to capture a reference for change notifications
      * without introducing a compile time cyclic dependency
      */
-    fun onAttach(adapter: PolyAdapter)
+    fun onAttach(listUpdateCallback: ListUpdateCallback, itemCallback: DiffUtil.ItemCallback<Any>)
   }
 
   /**
@@ -161,8 +164,6 @@ class PolyAdapter(val itemProvider: ItemProvider) :
     getDelegate(holder.itemViewType).asViewDetachedDelegate()?.onDetach(holder)
   }
 
-  val itemCallback: DiffUtil.ItemCallback<Any> = PolyAdapterItemCallback()
-
   inner class PolyAdapterItemCallback : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
       return when {
@@ -212,26 +213,4 @@ class PolyAdapter(val itemProvider: ItemProvider) :
 
   private fun BindingDelegate<Any, RecyclerView.ViewHolder>.asViewDetachedDelegate() =
       asType<OnViewDetachedDelegate<RecyclerView.ViewHolder>>()
-}
-
-/**
- * Blindly cast the itemProvider to a [PolyListItemProvider] to make list updates easier
- */
-fun PolyAdapter.updateList(items: List<Any>) {
-  (itemProvider as? PolyListItemProvider)?.updateList(items)
-      ?: throw UnsupportedOperationException(
-          "itemProvider was type ${itemProvider.javaClass.simpleName} " +
-              "but expected ${PolyListItemProvider::class.java.simpleName}"
-      )
-}
-
-/**
- * Blindly cast the itemProvider to a [PolyPagedListProvider] to make list updates easier
- */
-fun PolyAdapter.updatePagedList(items: PagedList<Any>) {
-  (itemProvider as? PolyPagedListProvider)?.updateList(items)
-      ?: throw UnsupportedOperationException(
-          "itemProvider was type ${itemProvider.javaClass.simpleName} " +
-              "but expected ${PolyPagedListProvider::class.java.simpleName}"
-      )
 }
