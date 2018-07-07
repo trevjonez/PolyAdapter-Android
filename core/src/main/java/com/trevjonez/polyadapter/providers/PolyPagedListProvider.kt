@@ -1,3 +1,5 @@
+@file:JvmName("PolyPagedListProvider")
+
 package com.trevjonez.polyadapter.providers
 
 import android.arch.paging.*

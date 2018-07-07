@@ -1,6 +1,7 @@
+@file:JvmName("PolyAdapter")
+
 package com.trevjonez.polyadapter
 
-import android.arch.paging.PagedList
 import android.support.annotation.LayoutRes
 import android.support.v4.util.SimpleArrayMap
 import android.support.v7.util.AdapterListUpdateCallback
@@ -24,7 +25,9 @@ class PolyAdapter(val itemProvider: ItemProvider) :
   }
 
   /**
-   * How [PolyAdapter] gets it's items, from a [List], [PagedList], or whatever you want.
+   * How [PolyAdapter] gets it's items, from a
+   * [List], [android.arch.paging.PagedList],
+   * or whatever you want to implement.
    *
    * @see PolyListItemProvider
    * @see PolyPagedListProvider
@@ -34,10 +37,10 @@ class PolyAdapter(val itemProvider: ItemProvider) :
     fun getItem(position: Int): Any
 
     /**
-     * Always called once from the [PolyAdapter] init block.
+     * Always called exactly once from the [PolyAdapter] init block.
      *
      * Allows the ItemProvider to capture a reference for change notifications
-     * without introducing a compile time cyclic dependency
+     * without introducing a compile time cyclic dependency.
      */
     fun onAttach(listUpdateCallback: ListUpdateCallback, itemCallback: DiffUtil.ItemCallback<Any>)
   }
@@ -90,7 +93,7 @@ class PolyAdapter(val itemProvider: ItemProvider) :
    * Add a new delegate to this [PolyAdapter]'s lookup tables.
    */
   fun addDelegate(delegate: BindingDelegate<*, *>) {
-    require(itemCount == 0) { "Do not modify delegate listing after supplying data to the ItemProvider"}
+    require(itemCount == 0) { "Do not modify delegate listing after supplying data to the ItemProvider" }
     val viewTypeOverwrite = layoutIdRegistry.put(delegate.layoutId, delegate)
     val dataTypeOverwrite = classTypeRegistry.put(delegate.dataType, delegate)
 

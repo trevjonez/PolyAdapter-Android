@@ -1,3 +1,4 @@
+@file:JvmName("PolyListItemProvider")
 package com.trevjonez.polyadapter.providers
 
 import android.os.Looper

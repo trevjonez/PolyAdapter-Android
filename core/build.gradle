@@ -12,7 +12,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 27
         versionName = project.version
-        consumerProguardFiles 'proguard-rules.pro'
+        consumerProguardFiles 'proguard-rules.pro', "${project.buildDir.path}/tmp/kotlin-classes/release/com/trevjonez/polyadapter/UsesOptionalDependency.class"
     }
 }
 

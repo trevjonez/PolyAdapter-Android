@@ -1,3 +1,4 @@
+@file:JvmName("PolyConcatProvider")
 package com.trevjonez.polyadapter.providers
 
 import android.support.v4.util.SimpleArrayMap

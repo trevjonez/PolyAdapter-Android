@@ -2,8 +2,8 @@ group = 'com.trevjonez.polyadapter'
 version = '0.2.0'
 
 buildscript {
-    ext.agp_version = '3.2.0-beta02'
-    ext.kotlin_version = '1.2.50'
+    ext.agp_version = '3.3.0-alpha02'
+    ext.kotlin_version = '1.2.51'
     ext.support_lib_version = '27.1.1'
     repositories {
         google()
