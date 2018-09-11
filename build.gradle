@@ -1,18 +1,19 @@
 group = 'com.trevjonez.polyadapter'
-version = '0.2.0'
+version = '0.3.0'
 
 buildscript {
-    ext.agp_version = '3.3.0-alpha02'
-    ext.kotlin_version = '1.2.51'
+    ext.agp_version = '3.3.0-alpha09'
+    ext.kotlin_version = '1.2.61'
     ext.support_lib_version = '27.1.1'
     repositories {
         google()
         jcenter()
+        gradlePluginPortal()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$agp_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'digital.wup:android-maven-publish:3.6.1'
+        classpath "com.trevjonez.android-components:plugin:0.1.0"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.1'
     }
 }

@@ -12,7 +12,8 @@ import java.util.concurrent.Executor
 
 class PolyListItemProvider(
     private val backgroundExecutor: Executor = BackgroundPool,
-    private val mainThreadExecutor: Executor = MainThread
+    private val mainThreadExecutor: Executor = MainThread,
+    private val contentsChanged: () -> Unit = {}
 ) : PolyAdapter.ItemProvider {
 
   private lateinit var listUpdateCallback: ListUpdateCallback
@@ -92,6 +93,7 @@ class PolyListItemProvider(
           if (updateCount == currentUpdateId) {
             list = newItems
             result.dispatchUpdatesTo(listUpdateCallback)
+            contentsChanged()
           }
         }
 

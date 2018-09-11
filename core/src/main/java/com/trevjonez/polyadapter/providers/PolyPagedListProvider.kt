@@ -18,7 +18,8 @@ import java.util.concurrent.Executor
 class PolyPagedListProvider(
     private val paddingItem: Any = Unit,
     private val backgroundExecutor: Executor = BackgroundPool,
-    private val mainThreadExecutor: Executor = MainThread
+    private val mainThreadExecutor: Executor = MainThread,
+    private val contentsChanged: () -> Unit = {}
 ) : PolyAdapter.ItemProvider {
 
   private lateinit var listUpdateCallback: ListUpdateCallback
@@ -125,6 +126,7 @@ class PolyPagedListProvider(
             snapshot = null
 
             postUpdates(oldSnapshot, newList, result)
+            contentsChanged()
           }
         }
       } catch (ignore: CancelDiffException) {

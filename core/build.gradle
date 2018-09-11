@@ -1,7 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
-apply plugin: 'digital.wup.android-maven-publish'
+apply plugin: 'com.trevjonez.android-components'
 
 group = rootProject.group
 version = rootProject.version
@@ -26,22 +27,9 @@ dependencies {
     testImplementation('junit:junit:4.12')
 }
 
-task sourceJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier "sources"
-}
-
 publishing {
-    repositories {
-        maven {
-            url
-        }
-    }
     publications {
-        mavenAar(MavenPublication) {
-            from components.android
-            artifact(sourceJar)
-
+        named("android").configure {
             pom {
                 name = 'core'
                 description = 'Multiple item/view type recycler view adapter'
@@ -75,7 +63,7 @@ publishing {
 bintray {
     user = project.findProperty('bintray_user')
     key = project.findProperty('bintray_api_key')
-    publications = ['mavenAar']
+    publications = ['android']
     pkg {
         repo = 'maven'
         name = 'PolyAdapter-Android'
