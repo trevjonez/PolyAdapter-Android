@@ -63,7 +63,7 @@ publishing {
 bintray {
     user = project.findProperty('bintray_user')
     key = project.findProperty('bintray_api_key')
-    publications = ['android']
+    publications = ['android', 'debug', 'release']
     pkg {
         repo = 'maven'
         name = 'PolyAdapter-Android'
