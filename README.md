@@ -2,19 +2,19 @@
 
 [ ![Download](https://api.bintray.com/packages/trevorjones141/maven/PolyAdapter-Android/images/download.svg?version=0.2.0) ](https://bintray.com/trevorjones141/maven/PolyAdapter-Android/0.2.0/link) [![](https://jitpack.io/v/trevjonez/polyadapter-android.svg)](https://jitpack.io/#trevjonez/polyadapter-android)
 
-Yet another recycler view adapter library that claims to be the last you will ever need.
+A composable recycler view adapter.
 
 ## Installation
 
 Available via [jcenter](https://bintray.com/trevorjones141/maven/PolyAdapter-Android) or [jitpack.io](https://jitpack.io/#trevjonez/polyadapter-android/0.2.0):
 
 ```groovy
-implementation 'com.trevjonez.polyadapter:core:0.2.0'
+implementation 'com.trevjonez.polyadapter:core:0.3.0'
 ```
 
 ## Usage
 
-To use the library there is basically three types you need to be aware of. 
+To use the library are three core types you need to be aware of.
 
 0. `PolyAdapter`
 1. `PolyAdapter.ItemProvider`
@@ -122,11 +122,9 @@ class SimpleTextItemDelegate: PolyAdapter.BindingDelegate<String, TextItemHolder
 
 #### More Delegates
 
-Lets assume for a moment you are a world class Android engineer and need
-more methods from `RecyclerView.Adapter` that don't exist on `PolyAdapter.BindingDelegate`
+If you need more methods from `RecyclerView.Adapter` that don't exist on `PolyAdapter.BindingDelegate`
 
-We thought of that and added a few optional interfaces for you to implement
-on your delegate classes if you care to receive those callbacks.
+There are a few optional interfaces for you to implement on your delegate classes.
 
 They are as follows:
 
@@ -138,21 +136,6 @@ method that includes payloads that are returned from your `DiffUtil.ItemCallback
 `PolyAdapter.OnViewAttachedDelegate` - Adds `onAttach`
 
 `PolyAdapter.OnViewDetachedDelegate` - Adds `onDetach`
-
-## But why?
-
-Most existing libraries are pretty good, and work well enough,
-but still fall short on one or more of the [SOLID principles of OOP.](https://en.wikipedia.org/wiki/SOLID)
-Most of the other solutions lack inversion of control, or require you
-subclass an abstract class losing composability options as a result.
-
-At the end of the day it turns out that I just have strong opinions
-about how recycler views should be setup. This implementation allows for
-very nice composition and pluggable list setups through things like dagger2
- multi bindings. You can have your list items actually include
-a `ViewModel`, `Presenter`, `Reducer` or whatever else so that the bind
-method actually does just that, binds your flavor of the week architecture
-to the view.
 
 ## License
 
