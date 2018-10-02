@@ -1,6 +1,6 @@
 # PolyAdapter-Android
 
-[ ![Download](https://api.bintray.com/packages/trevorjones141/maven/PolyAdapter-Android/images/download.svg?version=0.4.0) ](https://bintray.com/trevorjones141/maven/PolyAdapter-Android/0.4.0/link) [![](https://jitpack.io/v/trevjonez/polyadapter-android.svg)](https://jitpack.io/#trevjonez/polyadapter-android)
+[ ![Download](https://api.bintray.com/packages/trevorjones141/maven/PolyAdapter-Android/images/download.svg) ](https://bintray.com/trevorjones141/maven/PolyAdapter-Android/_latestVersion)
 
 A composable recycler view adapter.
 
