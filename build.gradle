@@ -1,10 +1,4 @@
-group = 'com.trevjonez.polyadapter'
-version = '0.3.0'
-
 buildscript {
-    ext.agp_version = '3.3.0-alpha09'
-    ext.kotlin_version = '1.2.61'
-    ext.support_lib_version = '27.1.1'
     repositories {
         google()
         jcenter()
@@ -13,7 +7,7 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$agp_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "com.trevjonez.android-components:plugin:0.1.0"
+        classpath 'digital.wup:android-maven-publish:3.6.2'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.1'
     }
 }

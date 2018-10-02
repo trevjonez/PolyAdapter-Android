@@ -1,104 +1,39 @@
 @file:JvmName("PolyListItemProvider")
+
 package com.trevjonez.polyadapter.providers
 
-import android.os.Looper
-import android.support.v7.util.DiffUtil
-import android.support.v7.util.ListUpdateCallback
+import androidx.recyclerview.widget.*
 import com.trevjonez.polyadapter.PolyAdapter
-import com.trevjonez.polyadapter.diffutil.BackgroundPool
-import com.trevjonez.polyadapter.diffutil.CancelDiffException
-import com.trevjonez.polyadapter.diffutil.MainThread
-import java.util.concurrent.Executor
 
+/**
+ * @param contentsChanged function called once the last diff callback has been delivered to the attached update callback
+ */
 class PolyListItemProvider(
-    private val backgroundExecutor: Executor = BackgroundPool,
-    private val mainThreadExecutor: Executor = MainThread,
-    private val contentsChanged: () -> Unit = {}
+    private val contentsChanged: (() -> Unit)? = null
 ) : PolyAdapter.ItemProvider {
 
-  private lateinit var listUpdateCallback: ListUpdateCallback
-  private lateinit var itemCallback: DiffUtil.ItemCallback<Any>
-
-  private var list: List<Any> = emptyList()
-  private var updateCount = 0
+  private lateinit var listDiffer: AsyncListDiffer<Any>
 
   override fun onAttach(listUpdateCallback: ListUpdateCallback, itemCallback: DiffUtil.ItemCallback<Any>) {
-    this.listUpdateCallback = listUpdateCallback
-    this.itemCallback = itemCallback
+    val finalDetector = object : BatchingListUpdateCallback(listUpdateCallback) {
+      override fun dispatchLastEvent() {
+        super.dispatchLastEvent()
+        contentsChanged?.invoke()
+      }
+    }
+
+    listDiffer = AsyncListDiffer(finalDetector, AsyncDifferConfig.Builder(itemCallback).build())
   }
 
   override fun getItemCount(): Int {
-    return list.size
+    return listDiffer.currentList.size
   }
 
   override fun getItem(position: Int): Any {
-    return requireNotNull(list[position])
+    return requireNotNull(listDiffer.currentList[position])
   }
 
-  @android.support.annotation.MainThread
-  fun updateList(newItems: List<Any>) {
-    require(Looper.myLooper() == Looper.getMainLooper())
-
-    val currentUpdateId = ++updateCount
-
-    if (newItems.isEmpty()) {
-      val removedCount = list.size
-      list = emptyList()
-      listUpdateCallback.onRemoved(0, removedCount)
-      return
-    }
-
-    if (list.isEmpty()) {
-      list = newItems
-      listUpdateCallback.onInserted(0, list.size)
-      return
-    }
-
-    val oldList = list
-
-    backgroundExecutor.execute {
-      try {
-
-        val result = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-          override fun getOldListSize() = oldList.size
-
-          override fun getNewListSize() = newItems.size
-
-          override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            if (updateCount > currentUpdateId) throw CancelDiffException()
-
-            return itemCallback.areItemsTheSame(
-                oldList[oldItemPosition], newItems[newItemPosition]
-            )
-          }
-
-          override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            if (updateCount > currentUpdateId) throw CancelDiffException()
-
-            return itemCallback.areContentsTheSame(
-                oldList[oldItemPosition], newItems[newItemPosition]
-            )
-          }
-
-          override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-            if (updateCount > currentUpdateId) throw CancelDiffException()
-
-            return itemCallback.getChangePayload(
-                oldList[oldItemPosition], newItems[newItemPosition]
-            )
-          }
-        })
-
-        mainThreadExecutor.execute {
-          if (updateCount == currentUpdateId) {
-            list = newItems
-            result.dispatchUpdatesTo(listUpdateCallback)
-            contentsChanged()
-          }
-        }
-
-      } catch (ignore: CancelDiffException) {
-      }
-    }
+  fun updateList(list: List<Any>) {
+    listDiffer.submitList(list)
   }
 }

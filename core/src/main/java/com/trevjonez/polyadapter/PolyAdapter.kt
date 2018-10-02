@@ -2,17 +2,15 @@
 
 package com.trevjonez.polyadapter
 
-import android.support.annotation.LayoutRes
-import android.support.v4.util.SimpleArrayMap
-import android.support.v7.util.AdapterListUpdateCallback
-import android.support.v7.util.DiffUtil
-import android.support.v7.util.ListUpdateCallback
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.trevjonez.polyadapter.providers.PolyListItemProvider
-import com.trevjonez.polyadapter.providers.PolyPagedListProvider
+import androidx.annotation.LayoutRes
+import androidx.collection.SimpleArrayMap
+import androidx.recyclerview.widget.AdapterListUpdateCallback
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListUpdateCallback
+import androidx.recyclerview.widget.RecyclerView
 
 class PolyAdapter(val itemProvider: ItemProvider) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -26,11 +24,8 @@ class PolyAdapter(val itemProvider: ItemProvider) :
 
   /**
    * How [PolyAdapter] gets it's items, from a
-   * [List], [android.arch.paging.PagedList],
+   * [List], [androidx.paging.PagedList],
    * or whatever you want to implement.
-   *
-   * @see PolyListItemProvider
-   * @see PolyPagedListProvider
    */
   interface ItemProvider {
     fun getItemCount(): Int
@@ -128,7 +123,10 @@ class PolyAdapter(val itemProvider: ItemProvider) :
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-    val delegate = layoutIdRegistry[viewType]
+    val delegate = requireNotNull(layoutIdRegistry[viewType]) {
+      "Not binding delegate found for viewType $viewType." +
+          "This should never happen as the delegate provides the viewType view the layout id property"
+    }
     val inflater = LayoutInflater.from(parent.context)
     return delegate.createViewHolder(inflater.inflate(delegate.layoutId, parent, false))
   }

@@ -1,35 +1,39 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
-apply plugin: 'com.trevjonez.android-components'
+apply plugin: 'digital.wup.android-maven-publish'
 
 group = rootProject.group
 version = rootProject.version
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionName = project.version
-        consumerProguardFiles 'proguard-rules.pro', "${project.buildDir.path}/tmp/kotlin-classes/release/com/trevjonez/polyadapter/UsesOptionalDependency.class"
+        consumerProguardFiles 'proguard-rules.pro'
     }
 }
 
 dependencies {
-    api("com.android.support:recyclerview-v7:$support_lib_version")
-
-    compileOnly('android.arch.paging:runtime:1.0.0')
-
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version")
+    api("androidx.recyclerview:recyclerview:1.0.0")
+    compileOnly('androidx.paging:paging-runtime:2.0.0')
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
 
     testImplementation('junit:junit:4.12')
 }
 
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "sources"
+}
+
 publishing {
     publications {
-        named("android").configure {
+        android(MavenPublication) {
+            from components.android
+            artifact(sourceJar)
             pom {
                 name = 'core'
                 description = 'Multiple item/view type recycler view adapter'
@@ -63,7 +67,7 @@ publishing {
 bintray {
     user = project.findProperty('bintray_user')
     key = project.findProperty('bintray_api_key')
-    publications = ['android', 'debug', 'release']
+    publications = ['android']
     pkg {
         repo = 'maven'
         name = 'PolyAdapter-Android'
