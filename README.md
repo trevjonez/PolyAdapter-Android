@@ -1,6 +1,6 @@
 # PolyAdapter-Android
 
-[ ![Download](https://api.bintray.com/packages/trevorjones141/maven/PolyAdapter-Android/images/download.svg?version=0.3.0) ](https://bintray.com/trevorjones141/maven/PolyAdapter-Android/0.3.0/link) [![](https://jitpack.io/v/trevjonez/polyadapter-android.svg)](https://jitpack.io/#trevjonez/polyadapter-android)
+[ ![Download](https://api.bintray.com/packages/trevorjones141/maven/PolyAdapter-Android/images/download.svg?version=0.4.0) ](https://bintray.com/trevorjones141/maven/PolyAdapter-Android/0.4.0/link) [![](https://jitpack.io/v/trevjonez/polyadapter-android.svg)](https://jitpack.io/#trevjonez/polyadapter-android)
 
 A composable recycler view adapter.
 
@@ -10,13 +10,12 @@ Available via [jcenter](https://bintray.com/trevorjones141/maven/PolyAdapter-And
 
 from jcenter: 
 ```groovy
-//TODO: Jcenter didn't like variant aware publishing of 0.3.0 and fails to resolve.
-implementation 'com.trevjonez.polyadapter:core:0.3.0'
+implementation 'com.trevjonez.polyadapter:core:0.4.0'
 ```
 
 from jitpack:
 ```groovy
- implementation 'com.github.trevjonez.polyadapter-android:core:0.3.0'
+ implementation 'com.github.trevjonez.polyadapter-android:core:0.4.0'
 ```
 
 ## Usage
