@@ -214,4 +214,15 @@ class PolyAdapter(val itemProvider: ItemProvider) :
 
   private fun BindingDelegate<Any, RecyclerView.ViewHolder>.asViewDetachedDelegate() =
       asType<OnViewDetachedDelegate<RecyclerView.ViewHolder>>()
+
+  /**
+   * Blindly cast the itemProvider to [T]
+   */
+  inline fun <reified T : PolyAdapter.ItemProvider> provider(): T {
+    return itemProvider as? T
+        ?: throw UnsupportedOperationException(
+            "itemProvider was type ${itemProvider.javaClass.simpleName} " +
+                "but expected ${T::class.java.simpleName}"
+        )
+  }
 }
