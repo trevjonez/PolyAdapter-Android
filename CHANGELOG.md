@@ -1,5 +1,10 @@
 ## Changelog
 
+### 0.5.0
+- Optional RxAndroid Dependency to provide an impl of an RX based diff processing list provider
+- Rename the existing providers, not everything needs to be poly. Breaking Change, Migration provided via deprecation.
+- Moved extension functions to live with the provider that they belong to. Breaking Change, Migration provided by IDE import prompt & optimize imports.
+
 ### 0.4.0
 - Api 28 target
 - Androidx migration

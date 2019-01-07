@@ -1,4 +1,4 @@
-@file:JvmName("PolyPagedListProvider")
+@file:JvmName("AsyncPagedListProvider")
 
 package com.trevjonez.polyadapter.providers
 
@@ -11,13 +11,25 @@ import androidx.recyclerview.widget.ListUpdateCallback
 import com.trevjonez.polyadapter.PolyAdapter
 
 /**
+ * Blindly cast the itemProvider to a [AsyncPagedListProvider] to make list updates easier
+ */
+fun PolyAdapter.updatePagedList(items: PagedList<Any>) = provider<AsyncPagedListProvider>().updateList(items)
+
+@Deprecated("Class renamed to more closely describe its implementation",
+    ReplaceWith("AsyncPagedListProvider(paddingItem, contentsChanged)",
+        "com.trevjonez.polyadapter.providers.AsyncPagedListProvider"),
+    DeprecationLevel.ERROR)
+fun PolyPagedListProvider(paddingItem: Any = Unit, contentsChanged: (() -> Unit)? = null) =
+    AsyncPagedListProvider(paddingItem, contentsChanged)
+
+/**
  * PagedList ItemProvider impl via delegation to [AsyncPagedListDiffer]
  *
  * It differs in two ways:
  * 1: It does not expose the `onCurrentListChanged` functionality.
  * 2: It allows customization of the padding object to preserve null safety.
  */
-class PolyPagedListProvider(
+class AsyncPagedListProvider(
     private val paddingItem: Any = Unit,
     private val contentsChanged: (() -> Unit)? = null
 ) : PolyAdapter.ItemProvider {

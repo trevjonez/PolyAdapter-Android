@@ -7,19 +7,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.trevjonez.polyadapter.PolyAdapter
 import com.trevjonez.polyadapter.R
 import com.trevjonez.polyadapter.databinding.SampleActivityBinding
-import com.trevjonez.polyadapter.providers.PolyListItemProvider
+import com.trevjonez.polyadapter.providers.AsyncListProvider
+import com.trevjonez.polyadapter.providers.updateList
 import com.trevjonez.polyadapter.sample.data.CategoryTitle
 import com.trevjonez.polyadapter.sample.data.DividerLine
 import com.trevjonez.polyadapter.sample.data.Movie
 import com.trevjonez.polyadapter.sample.delegates.CategoryDelegate
 import com.trevjonez.polyadapter.sample.delegates.DividerDelegate
 import com.trevjonez.polyadapter.sample.delegates.MovieDelegate
-import com.trevjonez.polyadapter.updateList
 
 class SampleActivity : AppCompatActivity() {
 
   private lateinit var viewBinding: SampleActivityBinding
-  private val polyAdapter = PolyAdapter(PolyListItemProvider()).apply {
+  private val polyAdapter = PolyAdapter(AsyncListProvider()).apply {
     addDelegate(CategoryDelegate())
     addDelegate(DividerDelegate())
     addDelegate(MovieDelegate())
