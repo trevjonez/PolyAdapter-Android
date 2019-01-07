@@ -10,12 +10,12 @@ Available via [jcenter](https://bintray.com/trevorjones141/maven/PolyAdapter-And
 
 from jcenter: 
 ```groovy
-implementation 'com.trevjonez.polyadapter:core:0.4.0'
+implementation 'com.trevjonez.polyadapter:core:0.5.0'
 ```
 
 from jitpack:
 ```groovy
- implementation 'com.github.trevjonez.polyadapter-android:core:0.4.0'
+ implementation 'com.github.trevjonez.polyadapter-android:core:0.5.0'
 ```
 
 ## Usage
@@ -29,20 +29,19 @@ To use the library are three core types you need to be aware of.
 In order to create a `PolyAdapter` you need to provide the constructor with a `PolyAdapter.ItemProvider` implementation.
 You can use one of the provided ItemProvider implementations or create your own.
 
-`PolyListItemProvider` operates on `List<Any>`:
+`AsyncListProvider` operates on `List<Any>`:
 ```kotlin
-val adapter = PolyAdapter(PolyListItemProvider())
+val adapter = PolyAdapter(AsyncListProvider())
 ```
 
 Then you can add your `PolyAdapter.BindingDelegate` implementations to your new adapter:
 ```kotlin
-val polyAdapter = PolyAdapter(PolyListItemProvider()).apply {
+val polyAdapter = PolyAdapter(AsyncListProvider()).apply {
   addDelegate(FooDelegate())
   addDelegate(BarDelegate())
 }
 
 recyclerView.apply {
-  layoutManager = LinearLayoutManager()
   adapter = polyAdapter
 }
 ```
@@ -142,6 +141,15 @@ method that includes payloads that are returned from your `DiffUtil.ItemCallback
 `PolyAdapter.OnViewAttachedDelegate` - Adds `onAttach`
 
 `PolyAdapter.OnViewDetachedDelegate` - Adds `onDetach`
+
+#### RxListProvider
+
+An RxJava based `RxListProvider` is also available. You can compose it
+on an observable of your source data and will transform your data into
+a ready to use function. Call the resulting function from the
+main thread to apply the diff and swap the data set, this also eliminates
+the need for a content changed callback as seen in `AsyncListProvider`.
+The transforming nature also keep disposal management simple.
 
 ## License
 
