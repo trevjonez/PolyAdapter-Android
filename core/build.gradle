@@ -1,84 +1,15 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'digital.wup.android-maven-publish'
+ext.artifactId = "polyadapter"
+description = 'Multiple item/view type recycler view adapter'
 
-group = rootProject.group
-version = rootProject.version
+apply from: "../lib-module.gradle"
+apply from: "../maven-publish-android.gradle"
+apply from: "../bintray.gradle"
 
-android {
-    compileSdkVersion 28
-    defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 28
-        versionName = project.version
-        consumerProguardFiles 'proguard-rules.pro'
-    }
-}
+apply plugin: 'kotlin-kapt'
 
 dependencies {
     api("androidx.recyclerview:recyclerview:1.0.0")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
 
-    compileOnly('androidx.paging:paging-runtime:2.0.0')
-    compileOnly('io.reactivex.rxjava2:rxandroid:2.1.0')
-
-    testImplementation('junit:junit:4.12')
-}
-
-task sourceJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    archiveClassifier.set("sources")
-}
-
-publishing {
-    publications {
-        android(MavenPublication) {
-            from components.android
-            artifact(sourceJar)
-            pom {
-                name = 'core'
-                description = 'Multiple item/view type recycler view adapter'
-                url = 'https://github.com/trevjonez/PolyAdapter-Android'
-
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id = 'TrevJonez'
-                        name = 'Trevor Jones'
-                        email = 'trevorjones141@gmail.com'
-                    }
-                }
-
-                scm {
-                    connection = 'scm:git:git@github.com:trevjonez/PolyAdapter-Android.git'
-                    developerConnection = 'scm:git:git@github.com:trevjonez/PolyAdapter-Android.git'
-                    url = 'https://github.com/trevjonez/PolyAdapter-Android'
-                }
-            }
-        }
-    }
-}
-
-bintray {
-    user = project.findProperty('bintray_user')
-    key = project.findProperty('bintray_api_key')
-    publications = ['android']
-    pkg {
-        repo = 'maven'
-        name = 'PolyAdapter-Android'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'git@github.com:trevjonez/PolyAdapter-Android.git'
-        version {
-            name = project.version
-            released = new Date()
-            vcsTag = project.version
-        }
-    }
+    api("com.google.dagger:dagger:$daggerVersion")
+    kapt("com.google.dagger:dagger-compiler:$daggerVersion")
 }

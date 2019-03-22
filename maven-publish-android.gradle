@@ -1,0 +1,37 @@
+apply plugin: 'digital.wup.android-maven-publish'
+
+publishing {
+    publications {
+        android(MavenPublication) {
+            from components.android
+            artifact(sourceJar)
+            artifactId = project.artifactId
+            pom {
+                name = project.artifactId
+                description = project.description
+                url = 'https://github.com/trevjonez/PolyAdapter-Android'
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'TrevJonez'
+                        name = 'Trevor Jones'
+                        email = 'trevorjones141@gmail.com'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:git@github.com:trevjonez/PolyAdapter-Android.git'
+                    developerConnection = 'scm:git:git@github.com:trevjonez/PolyAdapter-Android.git'
+                    url = 'https://github.com/trevjonez/PolyAdapter-Android'
+                }
+            }
+        }
+    }
+}

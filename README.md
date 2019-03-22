@@ -10,7 +10,7 @@ Available via [jcenter](https://bintray.com/trevorjones141/maven/PolyAdapter-And
 
 from jcenter: 
 ```groovy
-implementation 'com.trevjonez.polyadapter:core:0.5.0'
+implementation 'polyadapter:core:0.5.0'
 ```
 
 from jitpack:
