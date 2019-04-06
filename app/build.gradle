@@ -21,6 +21,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -42,5 +47,10 @@ dependencies {
     implementation("com.google.dagger:dagger-android-support:$daggerVersion")
     kapt("com.google.dagger:dagger-android-processor:$daggerVersion")
 
-    testImplementation('junit:junit:4.12')
+    testImplementation("androidx.test:runner:1.1.0")
+    testImplementation("androidx.test.ext:junit:1.1.0")
+    testImplementation("org.robolectric:robolectric:4.2.1")
+    testImplementation("androidx.test.espresso:espresso-core:3.1.0")
+    testImplementation("androidx.test.espresso:espresso-intents:3.1.0")
+    testImplementation("androidx.test.espresso:espresso-idling-resource:3.1.0")
 }
