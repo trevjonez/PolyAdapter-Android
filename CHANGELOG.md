@@ -1,11 +1,9 @@
 ## Changelog
 
-### 0.6.0
+### 0.6.0 - BREAKING CHANGES
+- Module breakup and artifact id changes
 - Move adapter configuration entirely into constructor
-- Relocate specific item providers into separate modules
-- Remove androidx list differ impl's
-TODO(readme updates)
-TODO(publishing configuration updates)
+- Remove androidx list differ provider impl's. Threading is on the consumer now.
 
 ### 0.5.0
 - Optional RxAndroid Dependency to provide an impl of an RX based diff processing list provider

@@ -57,40 +57,48 @@ class SampleActivity : DaggerAppCompatActivity() {
     super.onDestroy()
   }
 
+  @Module(includes = [
+    DelegatesModule::class,
+    ProviderModule::class
+  ])
+  abstract class PolyAdapterConfigModule
+
   @Module
   abstract class DelegatesModule {
     @Binds
     @IntoMap
     @ClassKey(CategoryTitle::class)
-    abstract fun categoryDelegate(impl: CategoryDelegate): PolyAdapter.BindingDelegate<*, *>
+    abstract fun categoryDelegate(impl: CategoryDelegate):
+        PolyAdapter.BindingDelegate<*, *>
 
     @Binds
     @IntoMap
     @ClassKey(DividerLine::class)
-    abstract fun dividerDelegate(impl: DividerDelegate): PolyAdapter.BindingDelegate<*, *>
+    abstract fun dividerDelegate(impl: DividerDelegate):
+        PolyAdapter.BindingDelegate<*, *>
 
     @Binds
     @IntoMap
     @ClassKey(Movie::class)
-    abstract fun movieDelegate(impl: MovieDelegate): PolyAdapter.BindingDelegate<*, *>
+    abstract fun movieDelegate(impl: MovieDelegate):
+        PolyAdapter.BindingDelegate<*, *>
 
     @Binds
-    abstract fun listProvider(impl: RxListProvider): PolyAdapter.ItemProvider
+    abstract fun listProvider(impl: RxListProvider):
+        PolyAdapter.ItemProvider
   }
 
   @Module
-  class ProvidesModule {
+  class ProviderModule {
     @Provides
     @ActivityScope
-    fun rxProvider(): RxListProvider {
-      return RxListProvider()
-    }
+    fun rxProvider() = RxListProvider()
   }
 
   @Module
   abstract class BindingModule {
     @ActivityScope
-    @ContributesAndroidInjector(modules = [DelegatesModule::class, ProvidesModule::class])
+    @ContributesAndroidInjector(modules = [PolyAdapterConfigModule::class])
     abstract fun contributeInjector(): SampleActivity
   }
 }
