@@ -6,7 +6,7 @@ import io.reactivex.ObservableTransformer
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import polyadapter.DefaultListProvider
+import polyadapter.ListProvider
 import polyadapter.PolyAdapter
 
 /**
@@ -20,13 +20,13 @@ class RxListProvider(
     defaultItems: List<Any> = emptyList(),
     private val workScheduler: Scheduler = Schedulers.computation(),
     private val mainScheduler: Scheduler = AndroidSchedulers.mainThread(),
-    private val defaultProvider: DefaultListProvider = DefaultListProvider(defaultItems)
-) : PolyAdapter.ItemProvider by defaultProvider,
+    private val listProvider: ListProvider = ListProvider(defaultItems)
+) : PolyAdapter.ItemProvider by listProvider,
     ObservableTransformer<List<Any>, () -> Unit> {
 
   override fun apply(upstream: Observable<List<Any>>): ObservableSource<() -> Unit> {
     return upstream.switchMap { newList ->
-      val diffWork = defaultProvider.updateItems(newList)
+      val diffWork = listProvider.updateItems(newList)
       Observable.fromCallable { diffWork() }
           .subscribeOn(workScheduler)
           .observeOn(mainScheduler)

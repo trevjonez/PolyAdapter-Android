@@ -1,13 +1,14 @@
 package polyadapter
 
 import android.os.Looper
+import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 
 /**
  * Default list provider encapsulates the basic flow for data swapping
  */
-class DefaultListProvider(
+class ListProvider(
     defaultItems: List<Any>
 ) : PolyAdapter.ItemProvider {
 
@@ -30,6 +31,12 @@ class DefaultListProvider(
   fun updateItems(newItems: List<Any>): () -> (() -> Unit) {
     val oldList = items
     return {
+      if (onMainThread())
+        Log.w(
+            "ListProvider",
+            "DiffResult processing should be ran on a background thread to avoid blocking the main thread."
+        )
+
       val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
         override fun getOldListSize() = oldList.size
 
@@ -46,7 +53,7 @@ class DefaultListProvider(
       }, true)
 
       val swapDataAndDispatchDiffResult: () -> Unit = {
-        if (Looper.myLooper() != Looper.getMainLooper())
+        if (!onMainThread())
           throw IllegalStateException("Data swap and diffResult dispatching must be called from the main thread")
         items = newItems
         diffResult.dispatchUpdatesTo(listUpdateCallback)
@@ -55,4 +62,7 @@ class DefaultListProvider(
       swapDataAndDispatchDiffResult
     }
   }
+
+  private fun onMainThread() =
+      Looper.myLooper() == Looper.getMainLooper()
 }

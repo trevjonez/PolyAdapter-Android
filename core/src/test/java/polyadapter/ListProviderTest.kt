@@ -1,40 +1,50 @@
-package polyadapter.provider
+package polyadapter
 
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
-import com.google.common.truth.Truth.assertThat
-import io.reactivex.Observable
-import io.reactivex.Scheduler
-import io.reactivex.schedulers.Schedulers
+import com.google.common.truth.Truth
 import org.junit.Test
 
-class RxListProviderTest {
-
-  private val workScheduler = CountingSchedulerWrapper(Schedulers.trampoline())
-  private val mainScheduler = CountingSchedulerWrapper(Schedulers.trampoline())
-
+class ListProviderTest {
   @Test
-  fun `schedulers invoked as expected`() {
-    val provider = RxListProvider(listOf(1, 2, 3), workScheduler, mainScheduler)
+  fun `diff calls delegated to attached item callback`() {
+    val provider = ListProvider(listOf(1, 2, 3))
     val listCallback = ListCallbackFake()
     val itemCallback = ItemCallbackFake()
     provider.onAttach(listCallback, itemCallback)
 
-    assertThat(workScheduler.workersCreated).isEqualTo(0)
-    assertThat(mainScheduler.workersCreated).isEqualTo(0)
-    Observable.just(listOf(3, 2, 1))
-        .compose(provider)
-        .blockingFirst()
-    assertThat(workScheduler.workersCreated).isEqualTo(1)
-    assertThat(mainScheduler.workersCreated).isEqualTo(1)
-  }
-}
+    provider.updateItems(listOf(1, 2, 3))()
 
-class CountingSchedulerWrapper(private val actual: Scheduler) : Scheduler() {
-  var workersCreated = 0L
-  override fun createWorker(): Worker {
-    workersCreated++
-    return actual.createWorker()
+    Truth.assertThat(itemCallback.itemSameInvocations).hasSize(6)
+    Truth.assertThat(itemCallback.contentsSameInvocations).hasSize(3)
+    Truth.assertThat(itemCallback.changePayloadInvocations).isEmpty()
+  }
+
+  @Test
+  fun `diff results delegated to attached list update callback`() {
+    val provider = ListProvider(listOf(1, 2, 3))
+    val listCallback = ListCallbackFake()
+    val itemCallback = ItemCallbackFake()
+    provider.onAttach(listCallback, itemCallback)
+
+    provider.updateItems(listOf(3, 2, 1))()()
+
+    Truth.assertThat(listCallback.movedInvocations).hasSize(2)
+  }
+
+  @Test
+  fun `diff results and data not applied until effector is invoked`() {
+    val provider = ListProvider(listOf(1, 2, 3))
+    val listCallback = ListCallbackFake()
+    val itemCallback = ItemCallbackFake()
+    provider.onAttach(listCallback, itemCallback)
+
+
+    val effector = provider.updateItems(listOf(3, 2, 1))()
+
+    Truth.assertThat(listCallback.totalInvocations).isEqualTo(0)
+    effector()
+    Truth.assertThat(listCallback.totalInvocations).isGreaterThan(0)
   }
 }
 
