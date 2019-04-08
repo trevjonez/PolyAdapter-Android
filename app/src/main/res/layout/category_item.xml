@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/headerText"
-    android:layout_width="match_parent"
-    android:layout_height="64dp"
-    android:background="@color/boring_header_background"
-    android:gravity="center_vertical|start"
-    android:padding="12dp"
-    android:textColor="@color/boring_header_text"
-    android:textSize="24sp"
-    tools:text="@tools:sample/cities"
-    />
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/headerText"
+  android:layout_width="match_parent"
+  android:layout_height="64dp"
+  android:background="@color/boring_header_background"
+  android:gravity="center_vertical|start"
+  android:padding="12dp"
+  android:textColor="@color/boring_header_text"
+  android:textSize="24sp"
+  tools:text="@tools:sample/cities"/>

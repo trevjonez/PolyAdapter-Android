@@ -6,16 +6,12 @@ A composable recycler view adapter.
 
 ## Installation
 
-Available via [jcenter](https://bintray.com/trevorjones141/maven/PolyAdapter-Android) or [jitpack.io](https://jitpack.io/#trevjonez/polyadapter-android):
+Available via [jcenter](https://bintray.com/trevorjones141/maven/PolyAdapter-Android)
 
 from jcenter: 
 ```groovy
-implementation 'com.trevjonez.polyadapter:core:0.5.0'
-```
-
-from jitpack:
-```groovy
- implementation 'com.github.trevjonez.polyadapter-android:core:0.5.0'
+implementation 'com.trevjonez.polyadapter:core:$polyAdapterVersion'
+implementation 'com.trevjonez.polyadapter:provider-rxjava2:$polyAdapterVersion'
 ```
 
 ## Usage
@@ -26,34 +22,87 @@ To use the library are three core types you need to be aware of.
 1. `PolyAdapter.ItemProvider`
 2. `PolyAdapter.BindingDelegate`
 
-In order to create a `PolyAdapter` you need to provide the constructor with a `PolyAdapter.ItemProvider` implementation.
-You can use one of the provided ItemProvider implementations or create your own.
+The recommended way to consume `PolyAdapter` is via [dagger.](https://google.github.io/dagger/)
 
-`AsyncListProvider` operates on `List<Any>`:
+Provide a binding for `ItemProvider` and utilize map multi-bindings for `Delegates`:
 ```kotlin
-val adapter = PolyAdapter(AsyncListProvider())
+@Module(includes = [
+  DelegatesModule::class,
+  ProviderModule::class
+])
+abstract class PolyAdapterConfigModule
+
+@Module
+abstract class DelegatesModule {
+  @Binds
+  @IntoMap
+  @ClassKey(CategoryTitle::class)
+  abstract fun categoryDelegate(impl: CategoryDelegate):
+      PolyAdapter.BindingDelegate<*, *>
+
+  @Binds
+  @IntoMap
+  @ClassKey(DividerLine::class)
+  abstract fun dividerDelegate(impl: DividerDelegate):
+      PolyAdapter.BindingDelegate<*, *>
+
+  @Binds
+  @IntoMap
+  @ClassKey(Movie::class)
+  abstract fun movieDelegate(impl: MovieDelegate):
+      PolyAdapter.BindingDelegate<*, *>
+
+  @Binds
+  abstract fun listProvider(impl: RxListProvider):
+      PolyAdapter.ItemProvider
+}
+
+@Module
+class ProviderModule {
+  @Provides
+  @ActivityScope
+  fun rxProvider() = RxListProvider()
+}
 ```
 
-Then you can add your `PolyAdapter.BindingDelegate` implementations to your new adapter:
+Request an injection of a `PolyAdapter` instance and pass it to your recycler:
 ```kotlin
-val polyAdapter = PolyAdapter(AsyncListProvider()).apply {
-  addDelegate(FooDelegate())
-  addDelegate(BarDelegate())
-}
+
+@Inject lateinit var polyAdapter: PolyAdapter
+
+[...]
 
 recyclerView.apply {
   adapter = polyAdapter
 }
+
 ```
 
-After that your adapter is ready to serve items via the ItemProvider we injected it with.
-This can be done either directly through the item provider's concrete api or one of the
-extension methods provided in the main library to make it feel a bit more familiar.
-
+To update the list contents send updates via the `ItemProvider` implementation.
+`RxListProvider`:
 ```kotlin
-someLiveDataSource.subscribe { listItems ->
-  adapter.updateList(listItems)
-}
+@Inject lateinit var itemProvider: RxListProvider
+
+[...]
+
+someLiveDataSource
+  .compose(itemProvider)
+  .subscribe { applyNewData ->
+    applyNewData()
+  }
+```
+
+`ListProvider`:
+```kotlin
+@Inject lateinit var itemProvider: ListProvider
+
+[...]
+
+val diffWork = itemProvider.updateItems(newItems)
+
+val applyNewData = diffWork() //do this from background thread
+
+applyNewData() //do this on main thread
 ```
 
 #### Binding Delegate's
@@ -141,15 +190,6 @@ method that includes payloads that are returned from your `DiffUtil.ItemCallback
 `PolyAdapter.OnViewAttachedDelegate` - Adds `onAttach`
 
 `PolyAdapter.OnViewDetachedDelegate` - Adds `onDetach`
-
-#### RxListProvider
-
-An RxJava based `RxListProvider` is also available. You can compose it
-on an observable of your source data and will transform your data into
-a ready to use function. Call the resulting function from the
-main thread to apply the diff and swap the data set, this also eliminates
-the need for a content changed callback as seen in `AsyncListProvider`.
-The transforming nature also keep disposal management simple.
 
 ## License
 

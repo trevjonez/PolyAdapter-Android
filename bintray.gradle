@@ -1,0 +1,18 @@
+apply plugin: 'com.jfrog.bintray'
+
+bintray {
+    user = project.findProperty('bintray_user')
+    key = project.findProperty('bintray_api_key')
+    publications = ['android']
+    pkg {
+        repo = 'maven'
+        name = 'PolyAdapter-Android'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'git@github.com:trevjonez/PolyAdapter-Android.git'
+        version {
+            name = project.version
+            released = new Date()
+            vcsTag = project.version
+        }
+    }
+}
