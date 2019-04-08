@@ -25,7 +25,6 @@ class SampleActivityTest {
 
   @Before
   fun setUp() {
-    pausingCompScheduler.pause()
     IdlingRegistry.getInstance().register(pausingCompScheduler.idlingResource)
     RxJavaPlugins.setComputationSchedulerHandler { pausingCompScheduler }
   }
@@ -38,19 +37,20 @@ class SampleActivityTest {
 
   @Test
   fun `Default empty list first then items applied successfully`() {
+    pausingCompScheduler.pause()
     ActivityScenario.launch(SampleActivity::class.java).use {
       onView(withId(R.id.recycler))
           .check(adapterItemCount(0))
 
       pausingCompScheduler.resume()
-      pausingCompScheduler.idlingResource.waitForComputationFinish()
+      pausingCompScheduler.idlingResource.waitForIdle()
 
       onView(withId(R.id.recycler))
           .check(adapterItemCount(13))
     }
   }
 
-  private fun IdlingResource.waitForComputationFinish(sleepMillis: Long = 10, timeoutMillis: Long = 2000) {
+  private fun IdlingResource.waitForIdle(sleepMillis: Long = 10, timeoutMillis: Long = 2000) {
     var sleepTime = 0L
     while (!isIdleNow) {
       Thread.sleep(sleepMillis)
@@ -60,13 +60,11 @@ class SampleActivityTest {
     }
   }
 
-  private fun adapterItemCount(expected: Int): ViewAssertion {
-    return ViewAssertion { view, noViewFoundException ->
-      noViewFoundException?.let { throw it }
-      val recycler = view as RecyclerView
-      val adapter = requireNotNull(recycler.adapter)
+  private fun adapterItemCount(expected: Int) = ViewAssertion { view, noViewFoundException ->
+    noViewFoundException?.let { throw it }
+    val recycler = view as RecyclerView
+    val adapter = requireNotNull(recycler.adapter)
 
-      assertThat("Wrong adapter item count", adapter.itemCount, Matchers.`is`(expected))
-    }
+    assertThat("Wrong adapter item count", adapter.itemCount, Matchers.`is`(expected))
   }
 }
