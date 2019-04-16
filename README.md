@@ -2,7 +2,7 @@
 
 [ ![Download](https://api.bintray.com/packages/trevorjones141/maven/PolyAdapter-Android/images/download.svg) ](https://bintray.com/trevorjones141/maven/PolyAdapter-Android/_latestVersion)
 
-A composable recycler view adapter.
+A dagger centric recycler view adapter.
 
 ## Installation
 

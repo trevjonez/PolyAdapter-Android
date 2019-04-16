@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.6.1
+- Synchronize Fix concurrency issue due to the lazy nature of delegate caching.
+
 ### 0.6.0 - BREAKING CHANGES
 - Module breakup and artifact id changes
 - Move adapter configuration entirely into constructor

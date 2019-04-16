@@ -5,11 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
-import androidx.collection.SimpleArrayMap
 import androidx.recyclerview.widget.AdapterListUpdateCallback
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -18,8 +18,8 @@ class PolyAdapter @Inject constructor(
     private val delegateFactories: Map<Class<*>, @JvmSuppressWildcards Provider<BindingDelegate<*, *>>>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-  private val typeLookup = SimpleArrayMap<Class<*>, BindingDelegate<*, *>>()
-  private val layoutLookup = SimpleArrayMap<Int, BindingDelegate<*, *>>()
+  private val typeLookup = ConcurrentHashMap<Class<*>, BindingDelegate<*, *>>()
+  private val layoutLookup = ConcurrentHashMap<Int, BindingDelegate<*, *>>()
 
   init {
     itemProvider.onAttach(AdapterListUpdateCallback(this), PolyAdapterItemCallback())
