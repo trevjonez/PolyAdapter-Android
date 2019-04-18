@@ -8,8 +8,6 @@ A dagger centric recycler view adapter.
 
 Available via [jcenter](https://bintray.com/trevorjones141/maven/PolyAdapter-Android)
 
-with the artifact renaming and addition in 0.6.0, the bintray to jcenter sync is broken. add `maven { url("https://dl.bintray.com/trevorjones141/maven") }` as a workaround until resolved.
-
 from jcenter: 
 ```groovy
 implementation 'com.trevjonez.polyadapter:core:$polyAdapterVersion'
