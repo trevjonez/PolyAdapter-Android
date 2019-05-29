@@ -61,7 +61,7 @@ abstract class DelegatesModule {
 class ProviderModule {
   @Provides
   @ActivityScope
-  fun rxProvider() = RxListProvider()
+  fun rxProvider(): PolyAdapter.ItemProvider = RxListProvider()
 }
 ```
 
