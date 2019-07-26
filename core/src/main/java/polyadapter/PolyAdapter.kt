@@ -87,9 +87,7 @@ class PolyAdapter @Inject constructor(
   override fun getItemViewType(position: Int): Int {
     val item = getItem(position)
     val delegate = getDelegate(item.javaClass)
-    return requireNotNull(delegate) {
-      "Failed to get layout id for item of type ${item.javaClass.name}"
-    }.layoutId
+    return delegate.layoutId
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -170,21 +168,29 @@ class PolyAdapter @Inject constructor(
       @Suppress("UNCHECKED_CAST")
       return typeLookup[itemType] as BindingDelegate<Any, RecyclerView.ViewHolder>
     } else {
-      val delegateFactory = delegateFactories[itemType]
-          ?: throw MissingDelegateException(itemType)
+      //Diff util can cause a race condition resulting in collision exceptions, double check lock to resolve.
+      synchronized(typeLookup) {
+        if (typeLookup.containsKey(itemType)) {
+          @Suppress("UNCHECKED_CAST")
+          return typeLookup[itemType] as BindingDelegate<Any, RecyclerView.ViewHolder>
+        }
 
-      val delegate = delegateFactory.get()
+        val delegateFactory = delegateFactories[itemType]
+            ?: throw MissingDelegateException(itemType, delegateFactories.keys)
 
-      typeLookup.put(delegate.dataType, delegate)?.let { existing ->
-        throw DataTypeCollisionException(existing, delegate)
+        val delegate = delegateFactory.get()
+
+        typeLookup.put(delegate.dataType, delegate)?.let { existing ->
+          throw DataTypeCollisionException(existing, delegate)
+        }
+
+        layoutLookup.put(delegate.layoutId, delegate)?.let { existing ->
+          throw LayoutIdCollisionException(existing, delegate)
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        return delegate as BindingDelegate<Any, RecyclerView.ViewHolder>
       }
-
-      layoutLookup.put(delegate.layoutId, delegate)?.let { existing ->
-        throw LayoutIdCollisionException(existing, delegate)
-      }
-
-      @Suppress("UNCHECKED_CAST")
-      return delegate as BindingDelegate<Any, RecyclerView.ViewHolder>
     }
   }
 
@@ -204,8 +210,9 @@ class PolyAdapter @Inject constructor(
   private fun BindingDelegate<Any, RecyclerView.ViewHolder>.asViewDetachedDelegate() =
       asType<OnViewDetachedDelegate<RecyclerView.ViewHolder>>()
 
-  class MissingDelegateException(itemType: Class<*>) :
-      RuntimeException("No delegate factory bound for Class<$itemType>")
+  class MissingDelegateException(itemType: Class<*>, keys: Set<Class<*>>) :
+      RuntimeException("No delegate factory bound for Class<$itemType>.\n" +
+          "Available delegate factory keys: ${keys.joinToString(prefix = "[\n", postfix = "\n]", separator = ",\n    ")}")
 
   class DataTypeCollisionException(
       existingDelegate: BindingDelegate<*, *>,
