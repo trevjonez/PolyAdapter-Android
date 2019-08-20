@@ -191,6 +191,16 @@ method that includes payloads that are returned from your `DiffUtil.ItemCallback
 
 `PolyAdapter.OnViewDetachedDelegate` - Adds `onDetach`
 
+#### Without using multibindings?
+
+While the dynamics of dagger multibindings can be great, sometimes it just doesn't fit a usecase very well. 
+
+To cover this, there is a secondary constructor on `PolyAdapter` that accepts a list pre-built delegates.
+
+```kotlin
+val adapter = PolyAdapter(itemProvider, listOf(DelegateFoo(), DelegateBar()))
+```
+
 ## License
 
     Copyright 2018 Trevor Jones

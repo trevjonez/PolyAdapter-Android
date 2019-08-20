@@ -9,20 +9,37 @@ import androidx.recyclerview.widget.AdapterListUpdateCallback
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Provider
 
-class PolyAdapter @Inject constructor(
-    private val itemProvider: ItemProvider,
-    private val delegateFactories: Map<Class<*>, @JvmSuppressWildcards Provider<BindingDelegate<*, *>>>
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-  private val typeLookup = ConcurrentHashMap<Class<*>, BindingDelegate<*, *>>()
-  private val layoutLookup = ConcurrentHashMap<Int, BindingDelegate<*, *>>()
+  private val typeLookup: ConcurrentHashMap<Class<*>, BindingDelegate<*, *>> = 
+      mutableMapOf<Class<*>, BindingDelegate<*, *>>()
 
-  init {
+  private val layoutLookup: ConcurrentHashMap<Int, BindingDelegate<*, *>> = 
+      mutableMapOf<Int, BindingDelegate<*, *>>()
+
+  private val itemProvider: ItemProvider
+  private val delegateFactories: Map<Class<*>, @JvmSuppressWildcards Provider<BindingDelegate<*, *>>>
+
+  @Inject
+  constructor(itemProvider: ItemProvider, delegateFactories: Map<Class<*>, @JvmSuppressWildcards Provider<BindingDelegate<*, *>>>) : super() {
+    this.itemProvider = itemProvider
+    this.delegateFactories = delegateFactories
     itemProvider.onAttach(AdapterListUpdateCallback(this), PolyAdapterItemCallback())
+  }
+
+  /**
+   * Optional manual use constructor for the times manual creation makes more sense.
+   */
+  constructor(
+      itemProvider: ItemProvider,
+      delegates: List<BindingDelegate<*, *>>
+  ) : super() {
+    this.itemProvider = itemProvider
+    this.delegateFactories = emptyMap()
+    synchronized(typeLookup) { delegates.forEach(::insertDelegate) }
   }
 
   /**
@@ -180,17 +197,21 @@ class PolyAdapter @Inject constructor(
 
         val delegate = delegateFactory.get()
 
-        typeLookup.put(delegate.dataType, delegate)?.let { existing ->
-          throw DataTypeCollisionException(existing, delegate)
-        }
-
-        layoutLookup.put(delegate.layoutId, delegate)?.let { existing ->
-          throw LayoutIdCollisionException(existing, delegate)
-        }
+        insertDelegate(delegate)
 
         @Suppress("UNCHECKED_CAST")
         return delegate as BindingDelegate<Any, RecyclerView.ViewHolder>
       }
+    }
+  }
+
+  private fun insertDelegate(delegate: BindingDelegate<*, *>) {
+    typeLookup.put(delegate.dataType, delegate)?.let { existing ->
+      throw DataTypeCollisionException(existing, delegate)
+    }
+
+    layoutLookup.put(delegate.layoutId, delegate)?.let { existing ->
+      throw LayoutIdCollisionException(existing, delegate)
     }
   }
 
