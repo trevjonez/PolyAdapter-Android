@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.7.0
+- Add secondary construction option for those time multibinds is just not the right solution.
+
 ### 0.6.1
 - Synchronize Fix concurrency issue due to the lazy nature of delegate caching.
 
