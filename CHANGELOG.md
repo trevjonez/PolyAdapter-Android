@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.8.0
+- Basic diff util callback factory functions
+
 ### 0.7.0
 - Add secondary construction option for those time multibinds is just not the right solution.
 

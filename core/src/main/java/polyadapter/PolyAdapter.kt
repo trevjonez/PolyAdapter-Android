@@ -14,11 +14,8 @@ import javax.inject.Provider
 
 class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-  private val typeLookup: ConcurrentHashMap<Class<*>, BindingDelegate<*, *>> = 
-      mutableMapOf<Class<*>, BindingDelegate<*, *>>()
-
-  private val layoutLookup: ConcurrentHashMap<Int, BindingDelegate<*, *>> = 
-      mutableMapOf<Int, BindingDelegate<*, *>>()
+  private val typeLookup = mutableMapOf<Class<*>, BindingDelegate<*, *>>()
+  private val layoutLookup = mutableMapOf<Int, BindingDelegate<*, *>>()
 
   private val itemProvider: ItemProvider
   private val delegateFactories: Map<Class<*>, @JvmSuppressWildcards Provider<BindingDelegate<*, *>>>
@@ -60,7 +57,7 @@ class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
   /**
    * The bare minimum properties and methods to describe the data type and view relationship.
    */
-  interface BindingDelegate<ItemType, HolderType : RecyclerView.ViewHolder> {
+  interface BindingDelegate<ItemType: Any, HolderType : RecyclerView.ViewHolder> {
     @get:LayoutRes
     val layoutId: Int
     val dataType: Class<ItemType>
@@ -72,7 +69,7 @@ class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
   /**
    * Implement on an instance of [BindingDelegate] to receive incremental bindView callbacks
    */
-  interface IncrementalBindingDelegate<in ItemType, HolderType : RecyclerView.ViewHolder> {
+  interface IncrementalBindingDelegate<in ItemType: Any, HolderType : RecyclerView.ViewHolder> {
     fun bindView(holderType: HolderType, item: ItemType, payloads: List<Any>)
   }
 

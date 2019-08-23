@@ -128,15 +128,16 @@ The pre-implemented item providers always use [`DiffUtil`](https://developer.and
 to compare your data and notify the adapter of changes, so the next property
 to implement is a [`DiffUtil.ItemCallback`](https://developer.android.com/reference/android/support/v7/util/DiffUtil.ItemCallback) for your data type.
 
+Factory functions for common comparison patterns are provided:
 ```kotlin
-override val itemCallback = object : DiffUtil.ItemCallback<String>() {
-  override fun areItemsTheSame(oldItem: String?, newItem: String?) =
-      oldItem === newItem
-
-  override fun areContentsTheSame(oldItem: String?, newItem: String?) =
-      oldItem == newItem
-}
+override val itemCallback = equalityItemCallback<String>()
 ```
+or if you want to customize the identity check:
+```kotlin
+override val itemCallback = equalityItemCallback<String> { hashCode() }
+```
+but if your usecase demands more fine grade control, provide a completely custom implementation of [`DiffUtil.ItemCallback`](https://developer.android.com/reference/android/support/v7/util/DiffUtil.ItemCallback).
+
 
 This leaves us with two methods left to implement:
 
@@ -158,13 +159,7 @@ class SimpleTextItemDelegate: PolyAdapter.BindingDelegate<String, TextItemHolder
 
   override val dataType = String::class.java
 
-  override val itemCallback = object : DiffUtil.ItemCallback<String>() {
-    override fun areItemsTheSame(oldItem: String?, newItem: String?) =
-        oldItem === newItem
-
-    override fun areContentsTheSame(oldItem: String?, newItem: String?) =
-        oldItem == newItem
-  }
+  override val itemCallback = equalityItemCallback<String>()
 
   override fun createViewHolder(itemView: View) = TextItemHolder(itemView)
 
