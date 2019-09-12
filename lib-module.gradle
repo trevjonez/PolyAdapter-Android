@@ -18,10 +18,10 @@ android {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     testImplementation('junit:junit:4.12')
-    testImplementation("com.google.truth:truth:0.43")
+    testImplementation("com.google.truth:truth:1.0")
 }
 
 task sourceJar(type: Jar) {

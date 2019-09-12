@@ -37,6 +37,7 @@ class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
     this.itemProvider = itemProvider
     this.delegateFactories = emptyMap()
     synchronized(typeLookup) { delegates.forEach(::insertDelegate) }
+    itemProvider.onAttach(AdapterListUpdateCallback(this), PolyAdapterItemCallback())
   }
 
   /**
