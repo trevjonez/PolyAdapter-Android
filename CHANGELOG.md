@@ -1,5 +1,13 @@
 ## Changelog
 
+### 0.9.0
+- Paged list support
+- RxListProvider is no more, use a ListProvider along with a DiffUtilTransformer for the same effect. 
+`.compose(rxListProvider)` becomes `.diffUtil(listProvider)`
+
+### 0.8.1
+- Bug fix with an overloaded constructor not attaching to item provider.
+
 ### 0.8.0
 - Basic diff util callback factory functions
 

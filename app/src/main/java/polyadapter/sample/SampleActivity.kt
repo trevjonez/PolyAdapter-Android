@@ -1,6 +1,8 @@
 package polyadapter.sample
 
 import android.os.Bundle
+import android.util.Log
+import androidx.annotation.Keep
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.Binds
@@ -11,8 +13,10 @@ import dagger.android.support.DaggerAppCompatActivity
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 import io.reactivex.disposables.CompositeDisposable
+import polyadapter.ListProvider
 import polyadapter.PolyAdapter
-import polyadapter.provider.RxListProvider
+import polyadapter.provider.PagedListProvider
+import polyadapter.provider.diffUtil
 import polyadapter.sample.data.CategoryTitle
 import polyadapter.sample.data.DividerLine
 import polyadapter.sample.data.Movie
@@ -32,8 +36,7 @@ class SampleActivity : DaggerAppCompatActivity() {
   @Inject
   lateinit var polyAdapter: PolyAdapter
 
-  @Inject
-  lateinit var rxProvider: RxListProvider
+  private val listProvider = ListProvider()
 
   private val createDisposables = CompositeDisposable()
 
@@ -47,7 +50,7 @@ class SampleActivity : DaggerAppCompatActivity() {
     }
 
     archThing.dataSource() //grab your data source
-        .compose(rxProvider) //pipe it into the list provider to calculate diff result
+        .diffUtil(listProvider) //pipe it into the list provider to calculate diff result
         .subscribe { it() } //apply the new list and diff result when you are ready
         .also { createDisposables.add(it) }
   }
@@ -56,12 +59,6 @@ class SampleActivity : DaggerAppCompatActivity() {
     createDisposables.dispose()
     super.onDestroy()
   }
-
-  @Module(includes = [
-    DelegatesModule::class,
-    ProviderModule::class
-  ])
-  abstract class PolyAdapterConfigModule
 
   @Module
   abstract class DelegatesModule {
@@ -82,23 +79,21 @@ class SampleActivity : DaggerAppCompatActivity() {
     @ClassKey(Movie::class)
     abstract fun movieDelegate(impl: MovieDelegate):
         PolyAdapter.BindingDelegate<*, *>
-
-    @Binds
-    abstract fun listProvider(impl: RxListProvider):
-        PolyAdapter.ItemProvider
   }
 
   @Module
-  class ProviderModule {
+  object ProvidesModule {
     @Provides
-    @ActivityScope
-    fun rxProvider() = RxListProvider()
+    @JvmStatic
+    fun itemProvider(activity: SampleActivity): PolyAdapter.ItemProvider = activity.listProvider
   }
 
   @Module
   abstract class BindingModule {
-    @ActivityScope
-    @ContributesAndroidInjector(modules = [PolyAdapterConfigModule::class])
+    @ContributesAndroidInjector(modules = [
+      DelegatesModule::class,
+      ProvidesModule::class
+    ])
     abstract fun contributeInjector(): SampleActivity
   }
 }

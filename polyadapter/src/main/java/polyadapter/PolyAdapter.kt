@@ -41,6 +41,15 @@ class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
   }
 
   /**
+   * Optional assisted inject factory to simplify item provider instance management.
+   */
+  class AssistedFactory @Inject constructor(
+      private val delegateFactories: Map<Class<*>, @JvmSuppressWildcards Provider<BindingDelegate<*, *>>>
+  ) {
+    fun build(itemProvider: ItemProvider): PolyAdapter = PolyAdapter(itemProvider, delegateFactories)
+  }
+
+  /**
    * Adapter data owner, lookups are delegated to an instance of ItemProvider
    */
   interface ItemProvider {
@@ -58,7 +67,7 @@ class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
   /**
    * The bare minimum properties and methods to describe the data type and view relationship.
    */
-  interface BindingDelegate<ItemType: Any, HolderType : RecyclerView.ViewHolder> {
+  interface BindingDelegate<ItemType : Any, HolderType : RecyclerView.ViewHolder> {
     @get:LayoutRes
     val layoutId: Int
     val dataType: Class<ItemType>
@@ -70,7 +79,7 @@ class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
   /**
    * Implement on an instance of [BindingDelegate] to receive incremental bindView callbacks
    */
-  interface IncrementalBindingDelegate<in ItemType: Any, HolderType : RecyclerView.ViewHolder> {
+  interface IncrementalBindingDelegate<in ItemType : Any, HolderType : RecyclerView.ViewHolder> {
     fun bindView(holderType: HolderType, item: ItemType, payloads: List<Any>)
   }
 

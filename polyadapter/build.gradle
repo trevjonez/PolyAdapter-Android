@@ -1,8 +1,6 @@
-ext.artifactId = "polyadapter"
 description = 'Multiple item/view type recycler view adapter'
 
 apply from: "../lib-module.gradle"
-apply from: "../maven-publish-android.gradle"
 apply from: "../bintray.gradle"
 
 apply plugin: 'kotlin-kapt'

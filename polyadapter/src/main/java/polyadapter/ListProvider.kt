@@ -4,13 +4,19 @@ import android.os.Looper
 import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
+import dagger.Binds
+import dagger.Module
 
 /**
  * Default list provider encapsulates the basic flow for data swapping
  */
-class ListProvider(
-    defaultItems: List<Any>
-) : PolyAdapter.ItemProvider {
+class ListProvider(defaultItems: List<Any> = emptyList()) : PolyAdapter.ItemProvider {
+
+  @Module
+  abstract class AsItemProvider {
+    @Binds
+    abstract fun itemProvider(impl: ListProvider): PolyAdapter.ItemProvider
+  }
 
   private lateinit var listUpdateCallback: ListUpdateCallback
   private lateinit var itemCallback: DiffUtil.ItemCallback<Any>
@@ -18,23 +24,26 @@ class ListProvider(
 
   override fun getItemCount() = items.size
   override fun getItem(position: Int) = items[position]
-  override fun onAttach(listUpdateCallback: ListUpdateCallback, itemCallback: DiffUtil.ItemCallback<Any>) {
+  override fun onAttach(
+    listUpdateCallback: ListUpdateCallback,
+    itemCallback: DiffUtil.ItemCallback<Any>
+  ) {
     this.listUpdateCallback = listUpdateCallback
     this.itemCallback = itemCallback
   }
 
   /**
    * @return A function that will calculate against the current list when updateItems was called and the newItems param.
-   * The result of the diff calculation function will return a function that can then be used to apply
-   * the diff util result and swap the data list.
+   * The result of the diff calculation function will return a function that is then used to apply
+   * the diff util result and swap the list within the adapter.
    */
   fun updateItems(newItems: List<Any>): () -> (() -> Unit) {
     val oldList = items
     return {
       if (onMainThread())
         Log.w(
-            "ListProvider",
-            "DiffResult processing should be ran on a background thread to avoid blocking the main thread."
+          "ListProvider",
+          "DiffResult processing should be ran on a background thread to avoid blocking the main thread."
         )
 
       val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
@@ -43,18 +52,17 @@ class ListProvider(
         override fun getNewListSize() = newItems.size
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-            itemCallback.areItemsTheSame(oldList[oldItemPosition], newItems[newItemPosition])
+          itemCallback.areItemsTheSame(oldList[oldItemPosition], newItems[newItemPosition])
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-            itemCallback.areContentsTheSame(oldList[oldItemPosition], newItems[newItemPosition])
+          itemCallback.areContentsTheSame(oldList[oldItemPosition], newItems[newItemPosition])
 
         override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int) =
-            itemCallback.getChangePayload(oldList[oldItemPosition], newItems[newItemPosition])
+          itemCallback.getChangePayload(oldList[oldItemPosition], newItems[newItemPosition])
       }, true)
 
       val swapDataAndDispatchDiffResult: () -> Unit = {
-        if (!onMainThread())
-          throw IllegalStateException("Data swap and diffResult dispatching must be called from the main thread")
+        check(onMainThread()) { "Data swap and diffResult dispatching must be called from the main thread" }
         items = newItems
         diffResult.dispatchUpdatesTo(listUpdateCallback)
       }
@@ -64,5 +72,5 @@ class ListProvider(
   }
 
   private fun onMainThread() =
-      Looper.myLooper() == Looper.getMainLooper()
+    Looper.myLooper() == Looper.getMainLooper()
 }

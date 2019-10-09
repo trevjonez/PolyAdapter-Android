@@ -24,14 +24,8 @@ To use the library are three core types you need to be aware of.
 
 The recommended way to consume `PolyAdapter` is via [dagger.](https://google.github.io/dagger/)
 
-Provide a binding for `ItemProvider` and utilize map multi-bindings for `Delegates`:
+Provide a binding for `ItemProvider` and utilize `Map` multi-bindings for `Delegates`:
 ```kotlin
-@Module(includes = [
-  DelegatesModule::class,
-  ProviderModule::class
-])
-abstract class PolyAdapterConfigModule
-
 @Module
 abstract class DelegatesModule {
   @Binds
@@ -51,22 +45,18 @@ abstract class DelegatesModule {
   @ClassKey(Movie::class)
   abstract fun movieDelegate(impl: MovieDelegate):
       PolyAdapter.BindingDelegate<*, *>
-
-  @Binds
-  abstract fun listProvider(impl: RxListProvider):
-      PolyAdapter.ItemProvider
 }
 
-@Module
-class ProviderModule {
+object ProvidesModule {
   @Provides
-  @ActivityScope
-  fun rxProvider() = RxListProvider()
+  fun itemProvider(activity: SampleActivity): 
+      PolyAdapter.ItemProvider = activity.itemProvider
 }
 ```
 
 Request an injection of a `PolyAdapter` instance and pass it to your recycler:
 ```kotlin
+val itemProvider = ListProvider()
 
 @Inject lateinit var polyAdapter: PolyAdapter
 
@@ -79,22 +69,10 @@ recyclerView.apply {
 ```
 
 To update the list contents send updates via the `ItemProvider` implementation.
-`RxListProvider`:
-```kotlin
-@Inject lateinit var itemProvider: RxListProvider
-
-[...]
-
-someLiveDataSource
-  .compose(itemProvider)
-  .subscribe { applyNewData ->
-    applyNewData()
-  }
-```
 
 `ListProvider`:
 ```kotlin
-@Inject lateinit var itemProvider: ListProvider
+val itemProvider = ListProvider()
 
 [...]
 
@@ -102,7 +80,20 @@ val diffWork = itemProvider.updateItems(newItems)
 
 val applyNewData = diffWork() //do this from background thread
 
-applyNewData() //do this on main thread
+applyNewData() //do this on main-thread
+```
+
+Provided helpers make RX composition simple:
+```kotlin
+@Inject lateinit var itemProvider: ListProvider
+
+[...]
+
+someLiveDataSource
+  .diffUtil(itemProvider)
+  .subscribe { applyNewData ->
+    applyNewData()
+  }
 ```
 
 #### Binding Delegate's
@@ -188,12 +179,36 @@ method that includes payloads that are returned from your `DiffUtil.ItemCallback
 
 #### Without using multibindings?
 
-While the dynamics of dagger multibindings can be great, sometimes it just doesn't fit a usecase very well. 
+While the dynamics of dagger multi-bindings can be great, sometimes it just doesn't fit the use case well. 
 
 To cover this, there is a secondary constructor on `PolyAdapter` that accepts a list pre-built delegates.
 
 ```kotlin
 val adapter = PolyAdapter(itemProvider, listOf(DelegateFoo(), DelegateBar()))
+```
+
+#### I want to use it without having to add an itemProvider directly to my dagger graph
+
+In this case an `AssistedFactory` is provided so that dagger can deal with the multi bindings and your
+code can manage the ItemProvider(s).
+
+Not wanting to expose the item provider often fits when you have multiple item providers for a given scope:
+```kotlin
+@Inject
+lateinit var adapterFactory: PolyAdapter.AssistedFactory
+
+val itemProviderOne = ListProvider()
+val itemProviderTwo = ListProvider()
+
+[...]
+
+recyclerViewOne.apply {
+  adapter = adapterFactory.build(itemProviderOne)
+}
+
+recyclerViewTwo.apply {
+  adapter = adapterFactory.build(itemProviderTwo)
+}
 ```
 
 ## License

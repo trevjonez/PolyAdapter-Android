@@ -1,9 +1,9 @@
-description = 'RxJava2 backed item provider for PolyAdapter'
+description = 'Paged list item provider for PolyAdapter'
 
 apply from: "../lib-module.gradle"
 apply from: "../bintray.gradle"
 
 dependencies {
     api(project(":polyadapter"))
-    api('io.reactivex.rxjava2:rxandroid:2.1.1')
+    api("androidx.paging:paging-runtime-ktx:2.1.0")
 }

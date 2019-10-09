@@ -1,6 +1,7 @@
 package polyadapter.sample
 
 import io.reactivex.Observable
+import polyadapter.provider.PagedListProvider
 import polyadapter.sample.data.CategoryTitle
 import polyadapter.sample.data.DividerLine
 import polyadapter.sample.data.Movie
@@ -39,4 +40,10 @@ class ArchitecturalThing @Inject constructor() {
         DividerLine()
     ))
   }
+
+  /**
+   * Ignore this, it is here just to help me verify proguard config rules that are packed into the paging AAR
+   */
+  @Suppress("unused")
+  private val pagedProvider = PagedListProvider().also { println(it) }
 }

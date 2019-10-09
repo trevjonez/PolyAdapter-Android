@@ -7,15 +7,17 @@ import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import org.junit.Test
+import polyadapter.ListProvider
 
-class RxListProviderTest {
+class DiffUtilTransformerTest {
 
   private val workScheduler = CountingSchedulerWrapper(Schedulers.trampoline())
   private val mainScheduler = CountingSchedulerWrapper(Schedulers.trampoline())
 
   @Test
   fun `schedulers invoked as expected`() {
-    val provider = RxListProvider(listOf(1, 2, 3), workScheduler, mainScheduler)
+    val provider = ListProvider(listOf(1, 2, 3))
+    val transformer = DiffUtilTransformer(provider::updateItems, workScheduler, mainScheduler)
     val listCallback = ListCallbackFake()
     val itemCallback = ItemCallbackFake()
     provider.onAttach(listCallback, itemCallback)
@@ -23,8 +25,8 @@ class RxListProviderTest {
     assertThat(workScheduler.workersCreated).isEqualTo(0)
     assertThat(mainScheduler.workersCreated).isEqualTo(0)
     Observable.just(listOf(3, 2, 1))
-        .compose(provider)
-        .blockingFirst()
+      .compose(transformer)
+      .blockingFirst()
     assertThat(workScheduler.workersCreated).isEqualTo(1)
     assertThat(mainScheduler.workersCreated).isEqualTo(1)
   }
