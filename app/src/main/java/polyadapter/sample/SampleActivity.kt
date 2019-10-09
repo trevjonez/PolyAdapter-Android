@@ -1,8 +1,6 @@
 package polyadapter.sample
 
 import android.os.Bundle
-import android.util.Log
-import androidx.annotation.Keep
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.Binds
@@ -15,7 +13,6 @@ import dagger.multibindings.IntoMap
 import io.reactivex.disposables.CompositeDisposable
 import polyadapter.ListProvider
 import polyadapter.PolyAdapter
-import polyadapter.provider.PagedListProvider
 import polyadapter.provider.diffUtil
 import polyadapter.sample.data.CategoryTitle
 import polyadapter.sample.data.DividerLine
@@ -50,9 +47,9 @@ class SampleActivity : DaggerAppCompatActivity() {
     }
 
     archThing.dataSource() //grab your data source
-        .diffUtil(listProvider) //pipe it into the list provider to calculate diff result
-        .subscribe { it() } //apply the new list and diff result when you are ready
-        .also { createDisposables.add(it) }
+      .diffUtil(listProvider) //pipe it into the list provider to calculate diff result
+      .subscribe { it() } //apply the new list and diff result when you are ready
+      .also { createDisposables.add(it) }
   }
 
   override fun onDestroy() {
@@ -66,19 +63,19 @@ class SampleActivity : DaggerAppCompatActivity() {
     @IntoMap
     @ClassKey(CategoryTitle::class)
     abstract fun categoryDelegate(impl: CategoryDelegate):
-        PolyAdapter.BindingDelegate<*, *>
+      PolyAdapter.BindingDelegate<*, *>
 
     @Binds
     @IntoMap
     @ClassKey(DividerLine::class)
     abstract fun dividerDelegate(impl: DividerDelegate):
-        PolyAdapter.BindingDelegate<*, *>
+      PolyAdapter.BindingDelegate<*, *>
 
     @Binds
     @IntoMap
     @ClassKey(Movie::class)
     abstract fun movieDelegate(impl: MovieDelegate):
-        PolyAdapter.BindingDelegate<*, *>
+      PolyAdapter.BindingDelegate<*, *>
   }
 
   @Module

@@ -7,9 +7,9 @@ import javax.inject.Singleton
 
 @Singleton
 @Component(
-    modules = [
-      SampleActivity.BindingModule::class,
-      AndroidInjectionModule::class
-    ]
+  modules = [
+    SampleActivity.BindingModule::class,
+    AndroidInjectionModule::class
+  ]
 )
 interface AppComponent : AndroidInjector<App>

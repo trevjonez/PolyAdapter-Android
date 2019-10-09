@@ -4,6 +4,6 @@ apply from: "../lib-module.gradle"
 apply from: "../bintray.gradle"
 
 dependencies {
-    api(project(":polyadapter"))
-    api('io.reactivex.rxjava2:rxandroid:2.1.1')
+  api(project(":polyadapter"))
+  api('io.reactivex.rxjava2:rxandroid:2.1.1')
 }

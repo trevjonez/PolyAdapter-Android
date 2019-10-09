@@ -6,8 +6,8 @@ import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
 class ShampooRule(
-    @IntRange(from = 1) val iterations: Int,
-    val printIterationLabels: Boolean = true
+  @IntRange(from = 1) val iterations: Int,
+  val printIterationLabels: Boolean = true
 ) : TestRule {
   override fun apply(base: Statement, description: Description): Statement {
     return object : Statement() {

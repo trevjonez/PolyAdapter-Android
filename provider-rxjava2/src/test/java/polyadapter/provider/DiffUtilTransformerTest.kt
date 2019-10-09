@@ -63,9 +63,9 @@ class ItemCallbackFake : DiffUtil.ItemCallback<Any>() {
 class ListCallbackFake : ListUpdateCallback {
   val totalInvocations: Int
     get() = changedInvocations.size +
-        movedInvocations.size +
-        insertedInvocations.size +
-        removedInvocations.size
+      movedInvocations.size +
+      insertedInvocations.size +
+      removedInvocations.size
 
   val changedInvocations = mutableListOf<Triple<Int, Int, Any?>>()
   override fun onChanged(position: Int, count: Int, payload: Any?) {

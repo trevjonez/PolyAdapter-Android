@@ -20,6 +20,7 @@ class DividerDelegate @Inject constructor() : PolyAdapter.BindingDelegate<Divide
       return oldItem === newItem
     }
   }
+
   override fun createViewHolder(itemView: View) = DividerHolder(itemView)
   override fun bindView(holder: DividerHolder, item: DividerLine) {}
 }

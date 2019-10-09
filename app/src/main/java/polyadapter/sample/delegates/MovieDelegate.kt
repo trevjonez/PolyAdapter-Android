@@ -27,7 +27,7 @@ class MovieDelegate @Inject constructor() : PolyAdapter.BindingDelegate<Movie, D
   }
 
   override fun createViewHolder(itemView: View): DataboundViewHolder<MovieItemBinding> =
-      DataboundViewHolder(bind(itemView)!!)
+    DataboundViewHolder(bind(itemView)!!)
 
   override fun bindView(holder: DataboundViewHolder<MovieItemBinding>, item: Movie) {
     holder.viewBinding.apply {
@@ -37,11 +37,11 @@ class MovieDelegate @Inject constructor() : PolyAdapter.BindingDelegate<Movie, D
       }
 
       GlideApp.with(movieImage)
-          .load(item.imgUrl)
-          .placeholder(R.drawable.ic_image_black_24dp)
-          .error(R.drawable.ic_broken_image_black_24dp)
-          .centerInside()
-          .into(movieImage)
+        .load(item.imgUrl)
+        .placeholder(R.drawable.ic_image_black_24dp)
+        .error(R.drawable.ic_broken_image_black_24dp)
+        .centerInside()
+        .into(movieImage)
     }
   }
 }

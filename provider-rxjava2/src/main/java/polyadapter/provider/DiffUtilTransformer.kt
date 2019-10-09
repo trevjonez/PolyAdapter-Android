@@ -16,32 +16,32 @@ import polyadapter.ListProvider
  * the previous work request will be disposed preventing the dispatch function from being emitted.
  */
 class DiffUtilTransformer<T : Any>(
-    private val diffWorkFactory: (newData: T) -> () -> (() -> Unit),
-    private val workScheduler: Scheduler = Schedulers.computation(),
-    private val mainScheduler: Scheduler = AndroidSchedulers.mainThread()
+  private val diffWorkFactory: (newData: T) -> () -> (() -> Unit),
+  private val workScheduler: Scheduler = Schedulers.computation(),
+  private val mainScheduler: Scheduler = AndroidSchedulers.mainThread()
 ) : ObservableTransformer<T, () -> Unit> {
 
   override fun apply(upstream: Observable<T>): ObservableSource<() -> Unit> {
     return upstream.switchMap { newList ->
       val diffWork = diffWorkFactory(newList)
       Observable.fromCallable { diffWork() }
-          .subscribeOn(workScheduler)
-          .observeOn(mainScheduler)
+        .subscribeOn(workScheduler)
+        .observeOn(mainScheduler)
     }
   }
 }
 
 fun Observable<List<Any>>.diffUtil(listProvider: ListProvider) =
-    this.compose(DiffUtilTransformer(listProvider::updateItems))
+  this.compose(DiffUtilTransformer(listProvider::updateItems))
 
 @Deprecated(
-    message = "Replaced by DiffUtilTransformer wrapping a ListProvider via `Observable.diffUtil(ListProvider)`",
-    replaceWith = ReplaceWith("ListProvider()", "polyadapter.ListProvider")
+  message = "Replaced by DiffUtilTransformer wrapping a ListProvider via `Observable.diffUtil(ListProvider)`",
+  replaceWith = ReplaceWith("ListProvider()", "polyadapter.ListProvider")
 )
 @Suppress("FunctionName")
 fun RxListProvider(
-    defaultItems: List<Any> = emptyList(),
-    workScheduler: Scheduler = Schedulers.computation(),
-    mainScheduler: Scheduler = AndroidSchedulers.mainThread(),
-    listProvider: ListProvider = ListProvider(defaultItems)
+  defaultItems: List<Any> = emptyList(),
+  workScheduler: Scheduler = Schedulers.computation(),
+  mainScheduler: Scheduler = AndroidSchedulers.mainThread(),
+  listProvider: ListProvider = ListProvider(defaultItems)
 ): Nothing = throw UnsupportedOperationException()

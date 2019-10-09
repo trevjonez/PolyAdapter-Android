@@ -2,21 +2,20 @@ package polyadapter.sample
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.*
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.reactivex.plugins.RxJavaPlugins
-import io.reactivex.schedulers.Schedulers
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import polyadapter.PauseableScheduler
-import polyadapter.ShampooRule
 import java.util.concurrent.TimeoutException
 
 @RunWith(AndroidJUnit4::class)
@@ -40,13 +39,13 @@ class SampleActivityTest {
     pausingCompScheduler.pause()
     ActivityScenario.launch(SampleActivity::class.java).use {
       onView(withId(R.id.recycler))
-          .check(adapterItemCount(0))
+        .check(adapterItemCount(0))
 
       pausingCompScheduler.resume()
       pausingCompScheduler.idlingResource.waitForIdle()
 
       onView(withId(R.id.recycler))
-          .check(adapterItemCount(13))
+        .check(adapterItemCount(13))
     }
   }
 

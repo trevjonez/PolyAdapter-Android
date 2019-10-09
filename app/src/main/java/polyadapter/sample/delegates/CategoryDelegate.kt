@@ -13,10 +13,10 @@ class CategoryDelegate @Inject constructor() : PolyAdapter.BindingDelegate<Categ
   override val dataType = CategoryTitle::class.java
   override val itemCallback = object : DiffUtil.ItemCallback<CategoryTitle>() {
     override fun areItemsTheSame(oldItem: CategoryTitle, newItem: CategoryTitle) =
-        oldItem == newItem
+      oldItem == newItem
 
     override fun areContentsTheSame(oldItem: CategoryTitle, newItem: CategoryTitle) =
-        oldItem == newItem
+      oldItem == newItem
   }
 
   override fun createViewHolder(itemView: View): CategoryHolder {

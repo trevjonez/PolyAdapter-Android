@@ -22,7 +22,7 @@ class PauseableScheduler(private val actual: Scheduler = Schedulers.newThread())
 
   private val pendingWork = LinkedList<() -> Unit>()
   val idlingResource: CountingIdlingResource =
-      CountingIdlingResource(PauseableScheduler::class.java.simpleName, true)
+    CountingIdlingResource(PauseableScheduler::class.java.simpleName, true)
 
   fun pause() {
     synchronized(pendingWork) {
