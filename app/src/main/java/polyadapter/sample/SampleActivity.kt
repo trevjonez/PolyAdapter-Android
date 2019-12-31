@@ -46,7 +46,8 @@ class SampleActivity : DaggerAppCompatActivity() {
       adapter = polyAdapter
     }
 
-    archThing.dataSource() //grab your data source
+    archThing.dataSource()
+      //grab your data source
       .diffUtil(listProvider) //pipe it into the list provider to calculate diff result
       .subscribe { it() } //apply the new list and diff result when you are ready
       .also { createDisposables.add(it) }

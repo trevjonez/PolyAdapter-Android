@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import dagger.Binds
 import dagger.Module
+import java.lang.System.identityHashCode
 
 /**
  * Default list provider encapsulates the basic flow for data swapping
@@ -38,7 +39,9 @@ class ListProvider(defaultItems: List<Any> = emptyList()) : PolyAdapter.ItemProv
    * the diff util result and swap the list within the adapter.
    */
   fun updateItems(newItems: List<Any>): () -> (() -> Unit) {
-    val oldList = items
+    check(onMainThread()) { "DiffResult Worker must be created on the main thread." }
+
+    val oldItems = items
     return {
       if (onMainThread())
         Log.w(
@@ -47,24 +50,30 @@ class ListProvider(defaultItems: List<Any> = emptyList()) : PolyAdapter.ItemProv
         )
 
       val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-        override fun getOldListSize() = oldList.size
+        override fun getOldListSize() = oldItems.size
 
         override fun getNewListSize() = newItems.size
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-          itemCallback.areItemsTheSame(oldList[oldItemPosition], newItems[newItemPosition])
+          itemCallback.areItemsTheSame(oldItems[oldItemPosition], newItems[newItemPosition])
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-          itemCallback.areContentsTheSame(oldList[oldItemPosition], newItems[newItemPosition])
+          itemCallback.areContentsTheSame(oldItems[oldItemPosition], newItems[newItemPosition])
 
         override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int) =
-          itemCallback.getChangePayload(oldList[oldItemPosition], newItems[newItemPosition])
+          itemCallback.getChangePayload(oldItems[oldItemPosition], newItems[newItemPosition])
       }, true)
 
       val swapDataAndDispatchDiffResult: () -> Unit = {
         check(onMainThread()) { "Data swap and diffResult dispatching must be called from the main thread" }
-        items = newItems
-        diffResult.dispatchUpdatesTo(listUpdateCallback)
+        if (items !== oldItems) {
+          Log.w("ListProvider", "Inconsistent ordering of diff result application detected.\n" +
+            "Trying to apply result of comparison Base@${identityHashCode(oldItems)} -> Head@${identityHashCode(newItems)}\n" +
+            "to Base@${identityHashCode(items)}, ")
+        } else {
+          items = newItems
+          diffResult.dispatchUpdatesTo(listUpdateCallback)
+        }
       }
 
       swapDataAndDispatchDiffResult

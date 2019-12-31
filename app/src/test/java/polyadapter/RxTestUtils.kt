@@ -6,7 +6,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
 import io.reactivex.schedulers.Schedulers
-import java.util.*
+import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.TimeUnit
 
 
@@ -20,23 +20,19 @@ class PauseableScheduler(private val actual: Scheduler = Schedulers.newThread())
   @Volatile
   private var paused = false
 
-  private val pendingWork = LinkedList<() -> Unit>()
+  private val pendingWork = ConcurrentLinkedDeque<() -> Unit>()
   val idlingResource: CountingIdlingResource =
     CountingIdlingResource(PauseableScheduler::class.java.simpleName, true)
 
   fun pause() {
-    synchronized(pendingWork) {
-      paused = true
-    }
+    paused = true
   }
 
   fun resume() {
-    synchronized(pendingWork) {
-      val pending = pendingWork.toList()
-      pendingWork.clear()
-      pending.forEach { it() }
-      paused = false
-    }
+    val pending = pendingWork.toList()
+    pendingWork.clear()
+    pending.forEach { it() }
+    paused = false
   }
 
   override fun createWorker(): Worker {
@@ -45,27 +41,28 @@ class PauseableScheduler(private val actual: Scheduler = Schedulers.newThread())
       override fun dispose() = realWorker.dispose()
       override fun isDisposed() = realWorker.isDisposed
 
-      init {
-        idlingResource.increment()
-      }
-
       override fun schedule(run: Runnable, delay: Long, unit: TimeUnit): Disposable {
-        return synchronized(pendingWork) {
-          CompositeDisposable().also { result ->
-            val decrementingRun = Runnable {
-              run.run()
-              idlingResource.decrement()
-            }
-            val workItem: () -> Unit = {
-              realWorker.schedule(decrementingRun, delay, unit).also { result.add(it) }
-            }
+        return CompositeDisposable().also { result ->
 
-            if (paused) {
-              Disposables.fromRunnable { pendingWork.remove(workItem) }.also { result.add(it) }
-              pendingWork.add(workItem)
-            } else {
-              workItem()
-            }
+          val workItem: () -> Unit = {
+            result.add(realWorker.schedule({
+              try{
+
+              idlingResource.increment()
+              run.run()
+              } finally {
+                idlingResource.decrement()
+              }
+            }, delay, unit))
+          }
+
+          if (paused) {
+            result.add(Disposables.fromRunnable {
+              pendingWork.remove(workItem)
+            })
+            pendingWork.add(workItem)
+          } else {
+            workItem()
           }
         }
       }

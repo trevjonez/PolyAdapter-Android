@@ -1,4 +1,2 @@
 include(':app')
 include(':polyadapter', ':provider-rxjava2', ':provider-paging')
-
-enableFeaturePreview('GRADLE_METADATA')

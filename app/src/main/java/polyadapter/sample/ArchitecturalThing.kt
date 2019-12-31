@@ -1,6 +1,9 @@
 package polyadapter.sample
 
 import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import polyadapter.provider.PagedListProvider
 import polyadapter.sample.data.CategoryTitle
 import polyadapter.sample.data.DividerLine
@@ -39,6 +42,17 @@ class ArchitecturalThing @Inject constructor() {
         "https://m.media-amazon.com/images/M/MV5BNzA5ZDNlZWMtM2NhNS00NDJjLTk4NDItYTRmY2EwMWZlMTY3XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,675,1000_AL_.jpg"),
       DividerLine()
     ))
+  }
+
+  fun fastSource(): Observable<List<Any>> {
+    return Observable.range(0, 10000)
+      .flatMapSingle {
+        Single.fromCallable {
+          (0 until 100).map { DividerLine() as Any }
+        }
+          .subscribeOn(Schedulers.computation())
+      }
+      .observeOn(AndroidSchedulers.mainThread())
   }
 
   /**

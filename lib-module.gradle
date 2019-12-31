@@ -3,10 +3,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
 android {
-  compileSdkVersion 28
+  compileSdkVersion 29
   defaultConfig {
     minSdkVersion 19
-    targetSdkVersion 28
+    targetSdkVersion 29
     versionName = project.version
     consumerProguardFiles 'proguard-rules.pro'
   }

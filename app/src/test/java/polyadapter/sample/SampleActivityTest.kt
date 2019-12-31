@@ -1,47 +1,54 @@
 package polyadapter.sample
 
+import android.os.Looper.getMainLooper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.ViewAssertion
+import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import io.reactivex.internal.schedulers.ComputationScheduler
 import io.reactivex.plugins.RxJavaPlugins
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Shadows.shadowOf
+import org.robolectric.annotation.Config
+import org.robolectric.annotation.LooperMode
+import org.robolectric.annotation.LooperMode.Mode.PAUSED
+import polyadapter.AndroidLogsRule
 import polyadapter.PauseableScheduler
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
+@LooperMode(PAUSED)
+@Config(sdk = [28])
 @RunWith(AndroidJUnit4::class)
 class SampleActivityTest {
-  private val pausingCompScheduler = PauseableScheduler()
+
+  @get:Rule
+  val logRule = AndroidLogsRule()
+
+  private val pausingCompScheduler = PauseableScheduler(ComputationScheduler())
 
   @Before
   fun setUp() {
-    IdlingRegistry.getInstance().register(pausingCompScheduler.idlingResource)
     RxJavaPlugins.setComputationSchedulerHandler { pausingCompScheduler }
   }
 
   @After
   fun tearDown() {
-    IdlingRegistry.getInstance().unregister(pausingCompScheduler.idlingResource)
     RxJavaPlugins.reset()
   }
 
   @Test
-  fun `Default empty list first then items applied successfully`() {
-    pausingCompScheduler.pause()
+  fun `Sample items applied successfully`() {
     ActivityScenario.launch(SampleActivity::class.java).use {
-      onView(withId(R.id.recycler))
-        .check(adapterItemCount(0))
-
-      pausingCompScheduler.resume()
       pausingCompScheduler.idlingResource.waitForIdle()
 
       onView(withId(R.id.recycler))
@@ -49,14 +56,20 @@ class SampleActivityTest {
     }
   }
 
-  private fun IdlingResource.waitForIdle(sleepMillis: Long = 10, timeoutMillis: Long = 2000) {
-    var sleepTime = 0L
-    while (!isIdleNow) {
-      Thread.sleep(sleepMillis)
-      sleepTime += sleepMillis
-      if (sleepTime >= timeoutMillis)
-        throw TimeoutException("IdlingResource \"$name\" failed to idle after ${sleepTime}ms")
+  private tailrec fun CountingIdlingResource.waitForIdle(sleepMillis: Long = 20, timeoutMillis: Long = 1000, sleepTotal: Long = 0) {
+    require(sleepMillis < timeoutMillis)
+    shadowOf(getMainLooper()).idleFor(sleepMillis, TimeUnit.MILLISECONDS)
+    Thread.sleep(sleepMillis)
+    shadowOf(getMainLooper()).idleFor(sleepMillis, TimeUnit.MILLISECONDS)
+
+    if (isIdleNow) return
+
+    if (sleepTotal >= timeoutMillis - sleepMillis) {
+      dumpStateToLogs()
+      throw TimeoutException("IdlingResource \"$name\" failed to idle after ${sleepTotal + sleepMillis}ms")
     }
+
+    waitForIdle(sleepMillis, timeoutMillis, sleepTotal + sleepMillis)
   }
 
   private fun adapterItemCount(expected: Int) = ViewAssertion { view, noViewFoundException ->

@@ -31,7 +31,7 @@ class DiffUtilTransformer<T : Any>(
   }
 }
 
-fun Observable<List<Any>>.diffUtil(listProvider: ListProvider) =
+fun Observable<List<Any>>.diffUtil(listProvider: ListProvider): Observable<() -> Unit> =
   this.compose(DiffUtilTransformer(listProvider::updateItems))
 
 @Deprecated(
