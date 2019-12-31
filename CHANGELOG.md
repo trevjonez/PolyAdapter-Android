@@ -1,5 +1,9 @@
 ## Changelog
 
+### 0.10.0
+- Threading and Consistency checks in the results of ListProvider
+- Latest transitive dependencies
+
 ### 0.9.0
 - Paged list support
 - RxListProvider is no more, use a ListProvider along with a DiffUtilTransformer for the same effect. 
