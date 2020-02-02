@@ -181,7 +181,7 @@ method that includes payloads that are returned from your `DiffUtil.ItemCallback
 
 While the dynamics of dagger multi-bindings can be great, sometimes it just doesn't fit the use case well. 
 
-To cover this, there is a secondary constructor on `PolyAdapter` that accepts a list pre-built delegates.
+To cover this, there is a secondary constructor on `PolyAdapter` that accepts a list of pre-built delegates.
 
 ```kotlin
 val adapter = PolyAdapter(itemProvider, listOf(DelegateFoo(), DelegateBar()))
