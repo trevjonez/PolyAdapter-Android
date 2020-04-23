@@ -5,5 +5,5 @@ apply from: "../bintray.gradle"
 
 dependencies {
   api(project(":polyadapter"))
-  api("androidx.paging:paging-runtime-ktx:2.1.0")
+  api('androidx.paging:paging-runtime-ktx:2.1.2')
 }

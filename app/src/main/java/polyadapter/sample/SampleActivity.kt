@@ -1,8 +1,6 @@
 package polyadapter.sample
 
 import android.os.Bundle
-import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -11,6 +9,7 @@ import dagger.android.support.DaggerAppCompatActivity
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import polyadapter.ListProvider
 import polyadapter.PolyAdapter
 import polyadapter.provider.diffUtil
@@ -39,18 +38,15 @@ class SampleActivity : DaggerAppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    viewBinding = DataBindingUtil.setContentView(this, R.layout.sample_activity)
+    viewBinding = SampleActivityBinding.inflate(layoutInflater)
+    setContentView(viewBinding.root)
 
-    viewBinding.recycler.apply {
-      layoutManager = LinearLayoutManager(context)
-      adapter = polyAdapter
-    }
+    viewBinding.recycler.adapter = polyAdapter
 
-    archThing.dataSource()
-      //grab your data source
+    archThing.dataSource() //grab your data source
       .diffUtil(listProvider) //pipe it into the list provider to calculate diff result
       .subscribe { it() } //apply the new list and diff result when you are ready
-      .also { createDisposables.add(it) }
+      .addTo(createDisposables)
   }
 
   override fun onDestroy() {

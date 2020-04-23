@@ -8,4 +8,5 @@
     android:layout_height="match_parent"
     android:layout_marginStart="64dp"
     android:background="@color/boring_divider" />
+
 </FrameLayout>

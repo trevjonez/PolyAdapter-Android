@@ -3,33 +3,22 @@ package polyadapter.sample.delegates
 import android.content.Intent
 import android.net.Uri
 import android.view.View
-import androidx.recyclerview.widget.DiffUtil
 import polyadapter.PolyAdapter
+import polyadapter.equalityItemCallback
 import polyadapter.sample.GlideApp
 import polyadapter.sample.R
 import polyadapter.sample.data.Movie
-import polyadapter.sample.databinding.MovieItemBinding
-import polyadapter.sample.databinding.MovieItemBinding.bind
-import polyadapter.sample.viewholder.DataboundViewHolder
+import polyadapter.sample.viewholder.MovieHolder
 import javax.inject.Inject
 
-class MovieDelegate @Inject constructor() : PolyAdapter.BindingDelegate<Movie, DataboundViewHolder<MovieItemBinding>> {
+class MovieDelegate @Inject constructor() : PolyAdapter.BindingDelegate<Movie, MovieHolder> {
   override val layoutId = R.layout.movie_item
   override val dataType = Movie::class.java
-  override val itemCallback = object : DiffUtil.ItemCallback<Movie>() {
-    override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean {
-      return oldItem.title == newItem.title
-    }
+  override val itemCallback = equalityItemCallback<Movie> { title }
 
-    override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean {
-      return oldItem == newItem
-    }
-  }
+  override fun createViewHolder(itemView: View) = MovieHolder(itemView)
 
-  override fun createViewHolder(itemView: View): DataboundViewHolder<MovieItemBinding> =
-    DataboundViewHolder(bind(itemView)!!)
-
-  override fun bindView(holder: DataboundViewHolder<MovieItemBinding>, item: Movie) {
+  override fun bindView(holder: MovieHolder, item: Movie) {
     holder.viewBinding.apply {
       movieTitle.text = item.title
       webLink.setOnClickListener {

@@ -35,7 +35,7 @@ class ArchitecturalThing @Inject constructor() {
       DividerLine(),
       Movie("The Two Towers",
         "https://www.imdb.com/title/tt0167261/",
-        "https://m.media-amazon.com/images/M/MV5BMDY0NmI4ZjctN2VhZS00YzExLTkyZGItMTJhOTU5NTg4MDU4XkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg"),
+        "https://m.media-amazon.com/images/M/MV5BNGE5MzIyNTAtNWFlMC00NDA2LWJiMjItMjc4Yjg1OWM5NzhhXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,684,1000_AL_.jpg"),
       DividerLine(),
       Movie("The Return of the King",
         "https://www.imdb.com/title/tt0167260/",
@@ -48,7 +48,7 @@ class ArchitecturalThing @Inject constructor() {
     return Observable.range(0, 10000)
       .flatMapSingle {
         Single.fromCallable {
-          (0 until 100).map { DividerLine() as Any }
+          (0 until 100).map<Int, Any> { DividerLine() }
         }
           .subscribeOn(Schedulers.computation())
       }

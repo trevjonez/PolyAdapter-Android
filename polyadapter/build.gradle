@@ -6,7 +6,7 @@ apply from: "../bintray.gradle"
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-  api("androidx.recyclerview:recyclerview:1.0.0")
+  api('androidx.recyclerview:recyclerview:1.1.0')
 
   api("com.google.dagger:dagger:$daggerVersion")
   kapt("com.google.dagger:dagger-compiler:$daggerVersion")
