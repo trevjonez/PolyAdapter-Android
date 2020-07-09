@@ -32,6 +32,9 @@ class SampleActivity : DaggerAppCompatActivity() {
   @Inject
   lateinit var polyAdapter: PolyAdapter
 
+  @Inject
+  lateinit var polyAdapterFactory: PolyAdapter.AssistedFactory
+
   private val listProvider = ListProvider()
 
   private val createDisposables = CompositeDisposable()
@@ -42,6 +45,8 @@ class SampleActivity : DaggerAppCompatActivity() {
     setContentView(viewBinding.root)
 
     viewBinding.recycler.adapter = polyAdapter
+    // or
+    viewBinding.recycler.adapter = polyAdapterFactory.build(listProvider)
 
     archThing.dataSource() //grab your data source
       .diffUtil(listProvider) //pipe it into the list provider to calculate diff result

@@ -6,6 +6,8 @@ import io.reactivex.ObservableTransformer
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import polyadapter.ApplyDiffResult
+import polyadapter.DiffWorkFactory
 import polyadapter.ListProvider
 
 /**
@@ -16,12 +18,12 @@ import polyadapter.ListProvider
  * the previous work request will be disposed preventing the dispatch function from being emitted.
  */
 class DiffUtilTransformer<T : Any>(
-  private val diffWorkFactory: (newData: T) -> () -> (() -> Unit),
+  private val diffWorkFactory: DiffWorkFactory<T>,
   private val workScheduler: Scheduler = Schedulers.computation(),
   private val mainScheduler: Scheduler = AndroidSchedulers.mainThread()
-) : ObservableTransformer<T, () -> Unit> {
+) : ObservableTransformer<T, ApplyDiffResult> {
 
-  override fun apply(upstream: Observable<T>): ObservableSource<() -> Unit> {
+  override fun apply(upstream: Observable<T>): ObservableSource<ApplyDiffResult> {
     return upstream.switchMap { newList ->
       val diffWork = diffWorkFactory(newList)
       Observable.fromCallable { diffWork() }
@@ -31,17 +33,6 @@ class DiffUtilTransformer<T : Any>(
   }
 }
 
-fun Observable<List<Any>>.diffUtil(listProvider: ListProvider): Observable<() -> Unit> =
-  this.compose(DiffUtilTransformer(listProvider::updateItems))
+fun Observable<List<Any>>.diffUtil(listProvider: ListProvider): Observable<ApplyDiffResult> =
+  compose(DiffUtilTransformer({ listProvider.updateItems(it) }))
 
-@Deprecated(
-  message = "Replaced by DiffUtilTransformer wrapping a ListProvider via `Observable.diffUtil(ListProvider)`",
-  replaceWith = ReplaceWith("ListProvider()", "polyadapter.ListProvider")
-)
-@Suppress("FunctionName")
-fun RxListProvider(
-  defaultItems: List<Any> = emptyList(),
-  workScheduler: Scheduler = Schedulers.computation(),
-  mainScheduler: Scheduler = AndroidSchedulers.mainThread(),
-  listProvider: ListProvider = ListProvider(defaultItems)
-): Nothing = throw UnsupportedOperationException()

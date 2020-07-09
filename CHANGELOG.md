@@ -1,5 +1,9 @@
 ## Changelog
 
+### 0.11.0
+- Kotlin Flow helpers
+- Type aliases for diffUtil helper readability
+
 ### 0.10.0
 - Threading and Consistency checks in the results of ListProvider
 - Latest transitive dependencies

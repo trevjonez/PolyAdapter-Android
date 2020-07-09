@@ -38,7 +38,7 @@ class ListProvider(defaultItems: List<Any> = emptyList()) : PolyAdapter.ItemProv
    * The result of the diff calculation function will return a function that is then used to apply
    * the diff util result and swap the list within the adapter.
    */
-  fun updateItems(newItems: List<Any>): () -> (() -> Unit) {
+  fun updateItems(newItems: List<Any>, detectMoves: Boolean = true): DiffWork {
     check(onMainThread()) { "DiffResult Worker must be created on the main thread." }
 
     val oldItems = items
@@ -62,9 +62,9 @@ class ListProvider(defaultItems: List<Any> = emptyList()) : PolyAdapter.ItemProv
 
         override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int) =
           itemCallback.getChangePayload(oldItems[oldItemPosition], newItems[newItemPosition])
-      }, true)
+      }, detectMoves)
 
-      val swapDataAndDispatchDiffResult: () -> Unit = {
+      val swapDataAndDispatchDiffResult: ApplyDiffResult = {
         check(onMainThread()) { "Data swap and diffResult dispatching must be called from the main thread" }
         if (items !== oldItems) {
           Log.w("ListProvider", "Inconsistent ordering of diff result application detected.\n" +

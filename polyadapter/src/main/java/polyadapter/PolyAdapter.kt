@@ -1,6 +1,5 @@
 package polyadapter
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +20,11 @@ class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
   private val delegateFactories: Map<Class<*>, @JvmSuppressWildcards Provider<BindingDelegate<*, *>>>
 
   @Inject
-  constructor(itemProvider: ItemProvider, delegateFactories: Map<Class<*>, @JvmSuppressWildcards Provider<BindingDelegate<*, *>>>) : super() {
+  constructor(
+    itemProvider: ItemProvider,
+    delegateFactories: Map<Class<*>,
+      @JvmSuppressWildcards Provider<BindingDelegate<*, *>>>
+  ) : super() {
     this.itemProvider = itemProvider
     this.delegateFactories = delegateFactories
     itemProvider.onAttach(AdapterListUpdateCallback(this), PolyAdapterItemCallback())
@@ -46,6 +49,7 @@ class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
   class AssistedFactory @Inject constructor(
     private val delegateFactories: Map<Class<*>, @JvmSuppressWildcards Provider<BindingDelegate<*, *>>>
   ) {
+
     fun build(itemProvider: ItemProvider): PolyAdapter = PolyAdapter(itemProvider, delegateFactories)
   }
 
@@ -66,6 +70,9 @@ class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
   /**
    * The bare minimum properties and methods to describe the data type and view relationship.
+   *
+   * Note: The default behavior of [PolyAdapter] is to lazily request the delegate via [Provider.get].
+   * As a result [BindingDelegate]'s are frequently created on a background thread.
    */
   interface BindingDelegate<ItemType : Any, HolderType : RecyclerView.ViewHolder> {
     @get:LayoutRes
@@ -159,18 +166,17 @@ class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
   inner class PolyAdapterItemCallback : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-      return when {
-        oldItem.javaClass == newItem.javaClass -> {
+      return when (oldItem.javaClass) {
+        newItem.javaClass -> {
           getDelegate(newItem.javaClass).itemCallback.areItemsTheSame(oldItem, newItem)
         }
         else -> false
       }
     }
 
-    @SuppressLint("DiffUtilEquals")
     override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-      return when {
-        oldItem.javaClass == newItem.javaClass -> {
+      return when (oldItem.javaClass) {
+        newItem.javaClass -> {
           getDelegate(newItem.javaClass).itemCallback.areContentsTheSame(oldItem, newItem)
         }
         else -> false
