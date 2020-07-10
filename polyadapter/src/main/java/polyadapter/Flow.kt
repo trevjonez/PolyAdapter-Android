@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transformLatest
+import java.util.*
 
 suspend fun ListProvider.calculateDiff(
   newList: List<Any>,
@@ -51,7 +52,7 @@ private class ScopedDelegateDefaultImpl(
   override val coroutineScope: CoroutineScope
     get() = this
 
-  private val holderScopes = mutableMapOf<RecyclerView.ViewHolder, CoroutineScope>()
+  private val holderScopes = WeakHashMap<RecyclerView.ViewHolder, CoroutineScope>()
 
   override val RecyclerView.ViewHolder.coroutineScope: CoroutineScope
     get() = holderScopes.getOrPut(this) {
