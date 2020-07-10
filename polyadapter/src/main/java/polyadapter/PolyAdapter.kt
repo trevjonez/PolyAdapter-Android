@@ -252,7 +252,8 @@ class PolyAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
     existingDelegate: BindingDelegate<*, *>,
     collidingDelegate: BindingDelegate<*, *>
   ) : RuntimeException(
-    "Data type: '${existingDelegate.dataType}' collides between '$collidingDelegate' and '$existingDelegate'."
+    "Data type: '${existingDelegate.dataType}' collides between '$collidingDelegate' and '$existingDelegate'.\n" +
+      "This error can be caught at compile time by using dagger to multi bind the delegate providers."
   )
 
   class LayoutIdCollisionException(

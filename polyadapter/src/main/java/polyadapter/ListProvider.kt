@@ -16,7 +16,7 @@ class ListProvider(defaultItems: List<Any> = emptyList()) : PolyAdapter.ItemProv
   @Module
   abstract class AsItemProvider {
     @Binds
-    abstract fun itemProvider(impl: ListProvider): PolyAdapter.ItemProvider
+    abstract fun ListProvider.itemProvider(): PolyAdapter.ItemProvider
   }
 
   private lateinit var listUpdateCallback: ListUpdateCallback

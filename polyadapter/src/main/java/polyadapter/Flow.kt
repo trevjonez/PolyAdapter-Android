@@ -1,11 +1,9 @@
 package polyadapter
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transformLatest
-import kotlinx.coroutines.withContext
 
 suspend fun ListProvider.calculateDiff(
   newList: List<Any>,
@@ -30,4 +28,37 @@ inline fun Flow<List<Any>>.diffUtil(
   crossinline diffWorkFactory: SuspendingDiffWorkFactory
 ): Flow<ApplyDiffResult> {
   return transformLatest { emit(diffWorkFactory(it)()) }
+}
+
+/**
+ * [PolyAdapter.BindingDelegate] that has its own scope as well as a scope per holder.
+ */
+interface ScopedDelegate : PolyAdapter.OnViewRecycledDelegate<RecyclerView.ViewHolder> {
+  val delegateScope: CoroutineScope
+
+  val RecyclerView.ViewHolder.viewHolderScope: CoroutineScope
+
+  companion object {
+    fun default(parentScope: CoroutineScope): ScopedDelegate =
+      ScopedDelegateDefaultImpl(parentScope)
+  }
+}
+
+private class ScopedDelegateDefaultImpl(
+  private val parentScope: CoroutineScope
+) : ScopedDelegate, CoroutineScope by parentScope + Job() {
+
+  override val delegateScope: CoroutineScope
+    get() = this
+
+  private val holderScopes = mutableMapOf<RecyclerView.ViewHolder, CoroutineScope>()
+
+  override val RecyclerView.ViewHolder.viewHolderScope: CoroutineScope
+    get() = holderScopes.getOrPut(this) {
+      this@ScopedDelegateDefaultImpl + Job()
+    }
+
+  override fun onRecycle(holder: RecyclerView.ViewHolder) {
+    holder.viewHolderScope.coroutineContext.cancelChildren()
+  }
 }

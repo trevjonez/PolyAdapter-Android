@@ -13,14 +13,9 @@ import io.reactivex.rxkotlin.addTo
 import polyadapter.ListProvider
 import polyadapter.PolyAdapter
 import polyadapter.provider.diffUtil
-import polyadapter.sample.data.CategoryTitle
-import polyadapter.sample.data.DividerLine
-import polyadapter.sample.data.Movie
 import polyadapter.sample.databinding.SampleActivityBinding
-import polyadapter.sample.delegates.CategoryDelegate
-import polyadapter.sample.delegates.DividerDelegate
-import polyadapter.sample.delegates.MovieDelegate
 import javax.inject.Inject
+import javax.inject.Scope
 
 class SampleActivity : DaggerAppCompatActivity() {
 
@@ -59,41 +54,40 @@ class SampleActivity : DaggerAppCompatActivity() {
     super.onDestroy()
   }
 
-  @Module
-  abstract class DelegatesModule {
+  @Module(includes = [ListProvider.AsItemProvider::class])
+  abstract class AdapterModule {
+
+    companion object {
+
+      @Provides
+      @ActivityScope
+      fun listProvider() = ListProvider()
+    }
+
     @Binds
     @IntoMap
     @ClassKey(CategoryTitle::class)
-    abstract fun categoryDelegate(impl: CategoryDelegate):
-      PolyAdapter.BindingDelegate<*, *>
+    abstract fun CategoryDelegate.category(): PolyAdapter.BindingDelegate<*, *>
 
     @Binds
     @IntoMap
     @ClassKey(DividerLine::class)
-    abstract fun dividerDelegate(impl: DividerDelegate):
-      PolyAdapter.BindingDelegate<*, *>
+    abstract fun DividerDelegate.divider(): PolyAdapter.BindingDelegate<*, *>
 
     @Binds
     @IntoMap
     @ClassKey(Movie::class)
-    abstract fun movieDelegate(impl: MovieDelegate):
-      PolyAdapter.BindingDelegate<*, *>
+    abstract fun MovieDelegate.movie(): PolyAdapter.BindingDelegate<*, *>
   }
 
   @Module
-  object ProvidesModule {
-    @Provides
-    @JvmStatic
-    fun itemProvider(activity: SampleActivity): PolyAdapter.ItemProvider = activity.listProvider
-  }
+  abstract class ContribModule {
 
-  @Module
-  abstract class BindingModule {
-    @ContributesAndroidInjector(modules = [
-      DelegatesModule::class,
-      ProvidesModule::class
-    ])
+    @ActivityScope
+    @ContributesAndroidInjector(modules = [AdapterModule::class])
     abstract fun contributeInjector(): SampleActivity
   }
 }
 
+@Scope
+annotation class ActivityScope
