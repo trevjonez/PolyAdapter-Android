@@ -34,9 +34,9 @@ inline fun Flow<List<Any>>.diffUtil(
  * [PolyAdapter.BindingDelegate] that has its own scope as well as a scope per holder.
  */
 interface ScopedDelegate : PolyAdapter.OnViewRecycledDelegate<RecyclerView.ViewHolder> {
-  val delegateScope: CoroutineScope
+  val coroutineScope: CoroutineScope
 
-  val RecyclerView.ViewHolder.viewHolderScope: CoroutineScope
+  val RecyclerView.ViewHolder.coroutineScope: CoroutineScope
 
   companion object {
     fun default(parentScope: CoroutineScope): ScopedDelegate =
@@ -48,17 +48,17 @@ private class ScopedDelegateDefaultImpl(
   private val parentScope: CoroutineScope
 ) : ScopedDelegate, CoroutineScope by parentScope + Job() {
 
-  override val delegateScope: CoroutineScope
+  override val coroutineScope: CoroutineScope
     get() = this
 
   private val holderScopes = mutableMapOf<RecyclerView.ViewHolder, CoroutineScope>()
 
-  override val RecyclerView.ViewHolder.viewHolderScope: CoroutineScope
+  override val RecyclerView.ViewHolder.coroutineScope: CoroutineScope
     get() = holderScopes.getOrPut(this) {
       this@ScopedDelegateDefaultImpl + Job()
     }
 
   override fun onRecycle(holder: RecyclerView.ViewHolder) {
-    holder.viewHolderScope.coroutineContext.cancelChildren()
+    holder.coroutineScope.coroutineContext.cancelChildren()
   }
 }

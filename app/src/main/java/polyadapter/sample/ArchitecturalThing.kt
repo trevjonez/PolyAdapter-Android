@@ -34,8 +34,9 @@ class ArchitecturalThing @Inject constructor() {
       Movie("The Return of the King",
         "https://www.imdb.com/title/tt0167260/",
         "https://m.media-amazon.com/images/M/MV5BNzA5ZDNlZWMtM2NhNS00NDJjLTk4NDItYTRmY2EwMWZlMTY3XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,675,1000_AL_.jpg"),
-      DividerLine()
-    ))
+      DividerLine(),
+      CategoryTitle("Flow Tickers")
+    ) + (1..42).flatMap { listOf(Ticker(), DividerLine()) })
   }
 
   /**

@@ -62,6 +62,9 @@ class SampleActivity : DaggerAppCompatActivity() {
       @Provides
       @ActivityScope
       fun listProvider() = ListProvider()
+
+      @Provides
+      fun hostLifecycle(activity: SampleActivity) = activity.lifecycle
     }
 
     @Binds
@@ -78,6 +81,11 @@ class SampleActivity : DaggerAppCompatActivity() {
     @IntoMap
     @ClassKey(Movie::class)
     abstract fun MovieDelegate.movie(): PolyAdapter.BindingDelegate<*, *>
+
+    @Binds
+    @IntoMap
+    @ClassKey(Ticker::class)
+    abstract fun TickerDelegate.ticker(): PolyAdapter.BindingDelegate<*, *>
   }
 
   @Module
