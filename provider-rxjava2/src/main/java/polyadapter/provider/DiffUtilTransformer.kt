@@ -17,13 +17,13 @@ import polyadapter.ListProvider
  * In the event of a new list emission before the last diff finishes calculating,
  * the previous work request will be disposed preventing the dispatch function from being emitted.
  */
-class DiffUtilTransformer<T : Any>(
-  private val diffWorkFactory: DiffWorkFactory<T>,
+class DiffUtilTransformer(
+  private val diffWorkFactory: DiffWorkFactory,
   private val workScheduler: Scheduler = Schedulers.computation(),
   private val mainScheduler: Scheduler = AndroidSchedulers.mainThread()
-) : ObservableTransformer<T, ApplyDiffResult> {
+) : ObservableTransformer<List<Any>, ApplyDiffResult> {
 
-  override fun apply(upstream: Observable<T>): ObservableSource<ApplyDiffResult> {
+  override fun apply(upstream: Observable<List<Any>>): ObservableSource<ApplyDiffResult> {
     return upstream.switchMap { newList ->
       val diffWork = diffWorkFactory(newList)
       Observable.fromCallable { diffWork() }

@@ -17,7 +17,7 @@ class DiffUtilTransformerTest {
   @Test
   fun `schedulers invoked as expected`() {
     val provider = ListProvider(listOf(1, 2, 3))
-    val transformer = DiffUtilTransformer(provider::updateItems, workScheduler, mainScheduler)
+    val transformer = DiffUtilTransformer({ provider.updateItems(it) }, workScheduler, mainScheduler)
     val listCallback = ListCallbackFake()
     val itemCallback = ItemCallbackFake()
     provider.onAttach(listCallback, itemCallback)

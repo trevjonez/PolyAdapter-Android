@@ -4,13 +4,11 @@ import androidx.paging.Config
 import androidx.paging.PagedList
 import androidx.paging.PositionalDataSource
 import androidx.recyclerview.widget.ListUpdateCallback
-import com.nhaarman.mockitokotlin2.verify
+import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import polyadapter.equalityItemCallback
 import java.util.concurrent.Executor
 
@@ -45,12 +43,38 @@ class PagedListProviderTest {
       }
     }
 
-  @Mock
-  lateinit var listUpdateCallback: ListUpdateCallback
+  private val listUpdateCallback = object : ListUpdateCallback {
+    val changed = mutableListOf<Triple<Int, Int, Any?>>()
+    override fun onChanged(position: Int, count: Int, payload: Any?) {
+      changed.add(Triple(position, count, payload))
+    }
+
+    val moved = mutableListOf<Pair<Int, Int>>()
+    override fun onMoved(fromPosition: Int, toPosition: Int) {
+      moved.add(fromPosition to toPosition)
+    }
+
+    val inserted = mutableListOf<Pair<Int, Int>>()
+    override fun onInserted(position: Int, count: Int) {
+      inserted.add(position to count)
+    }
+
+    val removed = mutableListOf<Pair<Int, Int>>()
+    override fun onRemoved(position: Int, count: Int) {
+      removed.add(position to count)
+    }
+
+    fun reset() {
+      changed.clear()
+      moved.clear()
+      inserted.clear()
+      removed.clear()
+    }
+  }
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
+    listUpdateCallback.reset()
   }
 
   @Test
@@ -65,7 +89,7 @@ class PagedListProviderTest {
     pagedProvider.updateItems(firstList)()()
 
     //Then:
-    verify(listUpdateCallback).onInserted(0, 50)
+    assertThat(listUpdateCallback.inserted).contains(0 to 50)
   }
 
   @Test
@@ -81,7 +105,7 @@ class PagedListProviderTest {
     firstList.loadAround(30)
 
     //Then:
-    verify(listUpdateCallback).onChanged(30, 10, null)
+    assertThat(listUpdateCallback.changed).contains(Triple(30, 10, null))
   }
 
   @Test
@@ -98,7 +122,7 @@ class PagedListProviderTest {
     pagedProvider.updateItems(secondList)()()
 
     //Then:
-    verify(listUpdateCallback).onRemoved(30, 20)
+    assertThat(listUpdateCallback.removed).contains(30 to 20)
   }
 }
 
