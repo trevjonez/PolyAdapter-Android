@@ -2,9 +2,7 @@
 
 ### 0.11.0
 - Kotlin Flow extensions for coroutine based diff work dispatching
-- Type aliases for diffUtil helper readability
-- Breaking change: Type aliases make the code easier to read,
-but broke the ability to use a method reference when creating a DiffUtilTransformer.
+- SAM fun interfaces for diffUtil helper readability
 - Breaking change: DiffUtilTransformer is no longer generic
 - Generation of BuildConfig has been disabled
 

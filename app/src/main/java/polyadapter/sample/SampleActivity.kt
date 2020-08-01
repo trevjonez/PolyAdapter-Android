@@ -30,7 +30,8 @@ class SampleActivity : DaggerAppCompatActivity() {
   @Inject
   lateinit var polyAdapterFactory: PolyAdapter.AssistedFactory
 
-  private val listProvider = ListProvider()
+  @Inject
+  lateinit var listProvider : ListProvider
 
   private val createDisposables = CompositeDisposable()
 
@@ -55,7 +56,7 @@ class SampleActivity : DaggerAppCompatActivity() {
   }
 
   @Module(includes = [ListProvider.AsItemProvider::class])
-  abstract class AdapterModule {
+  interface AdapterModule {
 
     companion object {
 
@@ -70,22 +71,22 @@ class SampleActivity : DaggerAppCompatActivity() {
     @Binds
     @IntoMap
     @ClassKey(CategoryTitle::class)
-    abstract fun CategoryDelegate.category(): PolyAdapter.BindingDelegate<*, *>
+    fun CategoryDelegate.category(): PolyAdapter.BindingDelegate<*, *>
 
     @Binds
     @IntoMap
     @ClassKey(DividerLine::class)
-    abstract fun DividerDelegate.divider(): PolyAdapter.BindingDelegate<*, *>
+    fun DividerDelegate.divider(): PolyAdapter.BindingDelegate<*, *>
 
     @Binds
     @IntoMap
     @ClassKey(Movie::class)
-    abstract fun MovieDelegate.movie(): PolyAdapter.BindingDelegate<*, *>
+    fun MovieDelegate.movie(): PolyAdapter.BindingDelegate<*, *>
 
     @Binds
     @IntoMap
     @ClassKey(Ticker::class)
-    abstract fun TickerDelegate.ticker(): PolyAdapter.BindingDelegate<*, *>
+    fun TickerDelegate.ticker(): PolyAdapter.BindingDelegate<*, *>
   }
 
   @Module

@@ -21,15 +21,13 @@ fun Flow<List<Any>>.diffUtil(
   detectMoves: Boolean = true,
   dispatcher: CoroutineDispatcher = Dispatchers.Default
 ): Flow<ApplyDiffResult> = diffUtil { newList ->
-  suspend { listProvider.calculateDiff(newList, detectMoves, dispatcher) }
+  SuspendingDiffWork { listProvider.calculateDiff(newList, detectMoves, dispatcher) }
 }
 
 @ExperimentalCoroutinesApi
-inline fun Flow<List<Any>>.diffUtil(
-  crossinline diffWorkFactory: SuspendingDiffWorkFactory
-): Flow<ApplyDiffResult> {
-  return transformLatest { emit(diffWorkFactory(it)()) }
-}
+fun Flow<List<Any>>.diffUtil(
+  diffWorkFactory: SuspendingDiffWorkFactory
+): Flow<ApplyDiffResult> = transformLatest { emit(diffWorkFactory(it)()) }
 
 /**
  * [PolyAdapter.BindingDelegate] that has its own scope as well as a scope per holder.

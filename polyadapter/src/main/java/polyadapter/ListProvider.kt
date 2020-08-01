@@ -42,7 +42,7 @@ class ListProvider(defaultItems: List<Any> = emptyList()) : PolyAdapter.ItemProv
     check(onMainThread()) { "DiffResult Worker must be created on the main thread." }
 
     val oldItems = items
-    return {
+    return DiffWork {
       if (onMainThread())
         Log.w(
           "ListProvider",
@@ -64,19 +64,17 @@ class ListProvider(defaultItems: List<Any> = emptyList()) : PolyAdapter.ItemProv
           itemCallback.getChangePayload(oldItems[oldItemPosition], newItems[newItemPosition])
       }, detectMoves)
 
-      val swapDataAndDispatchDiffResult: ApplyDiffResult = {
+      ApplyDiffResult {
         check(onMainThread()) { "Data swap and diffResult dispatching must be called from the main thread" }
         if (items !== oldItems) {
           Log.w("ListProvider", "Inconsistent ordering of diff result application detected.\n" +
             "Trying to apply result of comparison Base@${identityHashCode(oldItems)} -> Head@${identityHashCode(newItems)}\n" +
-            "to Base@${identityHashCode(items)}, ")
+            "to Base@${identityHashCode(items)}, data and diffResult will not be applied.")
         } else {
           items = newItems
           diffResult.dispatchUpdatesTo(listUpdateCallback)
         }
       }
-
-      swapDataAndDispatchDiffResult
     }
   }
 

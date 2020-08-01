@@ -52,7 +52,7 @@ class SampleActivityTest {
       pausingCompScheduler.idlingResource.waitForIdle()
 
       onView(withId(R.id.recycler))
-        .check(adapterItemCount(13))
+        .check(adapterItemCount(100))
     }
   }
 

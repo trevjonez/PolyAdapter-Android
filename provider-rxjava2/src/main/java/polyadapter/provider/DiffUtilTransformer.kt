@@ -34,5 +34,5 @@ class DiffUtilTransformer(
 }
 
 fun Observable<List<Any>>.diffUtil(listProvider: ListProvider): Observable<ApplyDiffResult> =
-  compose(DiffUtilTransformer({ listProvider.updateItems(it) }))
+  compose(DiffUtilTransformer(listProvider::updateItems))
 

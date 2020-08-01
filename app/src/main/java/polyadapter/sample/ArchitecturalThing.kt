@@ -5,7 +5,7 @@ import polyadapter.provider.PagedListProvider
 import javax.inject.Inject
 
 /**
- * place holder for VM/Presenter/etc...
+ * place holder for VM/Repo/etc...
  */
 class ArchitecturalThing @Inject constructor() {
   fun dataSource(): Observable<List<Any>> {
@@ -36,7 +36,7 @@ class ArchitecturalThing @Inject constructor() {
         "https://m.media-amazon.com/images/M/MV5BNzA5ZDNlZWMtM2NhNS00NDJjLTk4NDItYTRmY2EwMWZlMTY3XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,675,1000_AL_.jpg"),
       DividerLine(),
       CategoryTitle("Flow Tickers")
-    ) + (1..42).flatMap { listOf(Ticker(), DividerLine()) })
+    ) + (0..42).flatMap { listOf(Ticker(), DividerLine()) }) // big enough count of items to validate scope behavior on the ScopedDelegate as well as check for memory leaks
   }
 
   /**
