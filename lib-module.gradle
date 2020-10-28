@@ -3,15 +3,21 @@ apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
 android {
-  compileSdkVersion 29
+  compileSdkVersion Integer.parseInt(project.targetSdk)
   defaultConfig {
-    minSdkVersion 19
-    targetSdkVersion 29
+    minSdkVersion Integer.parseInt(project.minSdk)
+    targetSdkVersion Integer.parseInt(project.targetSdk)
     versionName = project.version
     consumerProguardFiles 'proguard-rules.pro'
   }
+
   testOptions {
     unitTests.returnDefaultValues = true
+  }
+
+  compileOptions {
+    sourceCompatibility 1.8
+    targetCompatibility 1.8
   }
 }
 

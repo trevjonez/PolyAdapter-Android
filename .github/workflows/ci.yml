@@ -1,0 +1,38 @@
+name: Build and Test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Gradle Wrapper Validation
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+
+      - name: Gradle build
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          script: ./gradlew build buildDashboard
+
+      - name: Upload build reports
+        uses: actions/upload-artifact@v2
+        with:
+          name: Build Reports
+          path: |
+            build/reports/
+            **/build/reports/
+            **/build/test-results/
