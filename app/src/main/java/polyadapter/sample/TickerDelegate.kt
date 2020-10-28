@@ -1,16 +1,13 @@
 package polyadapter.sample
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import polyadapter.PolyAdapter
 import polyadapter.ScopedDelegate
 import polyadapter.ScopedDelegate.Companion.default
@@ -34,19 +31,15 @@ class TickerDelegate @Inject constructor(
   override val itemCallback: DiffUtil.ItemCallback<Ticker> = equalityItemCallback()
   override fun createViewHolder(itemView: View) = TickerHolder(itemView)
   override fun bindView(holder: TickerHolder, item: Ticker) {
-    val flowJob = callbackFlow {
+    val job = holder.coroutineScope.launch {
       var count = 0
-      invokeOnClose { Log.i("TickerFlow", "Closed at count: $count") }
       while (true) {
-        send(count)
-        count++
+        holder.updateTicker(count++)
         delay(1000)
       }
     }
-      .onEach { holder.updateTicker(it) }
-      .launchIn(holder.coroutineScope)
 
-    holder.setJobHash(identityHashCode(flowJob))
+    holder.setJobHash(identityHashCode(job))
   }
 }
 
