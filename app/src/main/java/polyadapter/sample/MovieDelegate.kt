@@ -1,14 +1,13 @@
-package polyadapter.sample.delegates
+package polyadapter.sample
 
 import android.content.Intent
 import android.net.Uri
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import polyadapter.PolyAdapter
 import polyadapter.equalityItemCallback
-import polyadapter.sample.GlideApp
-import polyadapter.sample.R
-import polyadapter.sample.data.Movie
-import polyadapter.sample.viewholder.MovieHolder
+import polyadapter.sample.databinding.MovieItemBinding
 import javax.inject.Inject
 
 class MovieDelegate @Inject constructor() : PolyAdapter.BindingDelegate<Movie, MovieHolder> {
@@ -25,12 +24,27 @@ class MovieDelegate @Inject constructor() : PolyAdapter.BindingDelegate<Movie, M
         it.context.startActivity(Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(item.url) })
       }
 
-      GlideApp.with(movieImage)
-        .load(item.imgUrl)
-        .placeholder(R.drawable.ic_image_black_24dp)
-        .error(R.drawable.ic_broken_image_black_24dp)
-        .centerInside()
-        .into(movieImage)
+      movieImage.apply {
+        contentDescription = context.getString(
+          R.string.movie_poster_content_description,
+          item.title
+        )
+
+        load(item.imgUrl) {
+          placeholder(R.drawable.ic_image_black_24dp)
+          error(R.drawable.ic_broken_image_black_24dp)
+        }
+      }
     }
   }
 }
+
+class MovieHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+  val viewBinding = MovieItemBinding.bind(itemView)
+}
+
+data class Movie(
+  val title: CharSequence,
+  val url: String,
+  val imgUrl: String
+)

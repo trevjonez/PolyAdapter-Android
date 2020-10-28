@@ -1,5 +1,11 @@
 ## Changelog
 
+### 0.11.0
+- Kotlin Flow extensions for coroutine based diff work dispatching
+- SAM fun interfaces for diffUtil helper readability
+- Breaking change: DiffUtilTransformer is no longer generic
+- Generation of BuildConfig has been disabled
+
 ### 0.10.0
 - Threading and Consistency checks in the results of ListProvider
 - Latest transitive dependencies

@@ -1,4 +1,5 @@
 <resources>
   <string name="app_name">PolyAdapter</string>
   <string name="open_in_browser">Open in browser</string>
+  <string name="movie_poster_content_description">Movie poster\n%1$s</string>
 </resources>

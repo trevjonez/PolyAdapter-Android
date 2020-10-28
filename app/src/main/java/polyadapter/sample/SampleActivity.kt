@@ -1,6 +1,7 @@
 package polyadapter.sample
 
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -10,17 +11,15 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import polyadapter.ListProvider
 import polyadapter.PolyAdapter
+import polyadapter.diffUtil
 import polyadapter.provider.diffUtil
-import polyadapter.sample.data.CategoryTitle
-import polyadapter.sample.data.DividerLine
-import polyadapter.sample.data.Movie
 import polyadapter.sample.databinding.SampleActivityBinding
-import polyadapter.sample.delegates.CategoryDelegate
-import polyadapter.sample.delegates.DividerDelegate
-import polyadapter.sample.delegates.MovieDelegate
 import javax.inject.Inject
+import javax.inject.Scope
 
 class SampleActivity : DaggerAppCompatActivity() {
 
@@ -32,7 +31,11 @@ class SampleActivity : DaggerAppCompatActivity() {
   @Inject
   lateinit var polyAdapter: PolyAdapter
 
-  private val listProvider = ListProvider()
+  @Inject
+  lateinit var polyAdapterFactory: PolyAdapter.AssistedFactory
+
+  @Inject
+  lateinit var listProvider : ListProvider
 
   private val createDisposables = CompositeDisposable()
 
@@ -42,11 +45,22 @@ class SampleActivity : DaggerAppCompatActivity() {
     setContentView(viewBinding.root)
 
     viewBinding.recycler.adapter = polyAdapter
+    // or
+    viewBinding.recycler.adapter = polyAdapterFactory.build(listProvider)
 
-    archThing.dataSource() //grab your data source
+    // rx data source
+    archThing.rxDataSource() //grab your data source
       .diffUtil(listProvider) //pipe it into the list provider to calculate diff result
       .subscribe { it() } //apply the new list and diff result when you are ready
       .addTo(createDisposables)
+
+    // or
+
+    // coroutines flow data source
+    archThing.flowDataSource() //grab your data source
+      .diffUtil(listProvider) //pipe it into the list provider to calculate diff result
+      .onEach { it() } //apply the new list and diff result when you are ready
+      .launchIn(lifecycleScope)
   }
 
   override fun onDestroy() {
@@ -54,41 +68,48 @@ class SampleActivity : DaggerAppCompatActivity() {
     super.onDestroy()
   }
 
-  @Module
-  abstract class DelegatesModule {
+  @Module(includes = [ListProvider.AsItemProvider::class])
+  interface AdapterModule {
+
+    companion object {
+
+      @Provides
+      @ActivityScope
+      fun listProvider() = ListProvider()
+
+      @Provides
+      fun hostLifecycle(activity: SampleActivity) = activity.lifecycle
+    }
+
     @Binds
     @IntoMap
     @ClassKey(CategoryTitle::class)
-    abstract fun categoryDelegate(impl: CategoryDelegate):
-      PolyAdapter.BindingDelegate<*, *>
+    fun CategoryDelegate.category(): PolyAdapter.BindingDelegate<*, *>
 
     @Binds
     @IntoMap
     @ClassKey(DividerLine::class)
-    abstract fun dividerDelegate(impl: DividerDelegate):
-      PolyAdapter.BindingDelegate<*, *>
+    fun DividerDelegate.divider(): PolyAdapter.BindingDelegate<*, *>
 
     @Binds
     @IntoMap
     @ClassKey(Movie::class)
-    abstract fun movieDelegate(impl: MovieDelegate):
-      PolyAdapter.BindingDelegate<*, *>
+    fun MovieDelegate.movie(): PolyAdapter.BindingDelegate<*, *>
+
+    @Binds
+    @IntoMap
+    @ClassKey(Ticker::class)
+    fun TickerDelegate.ticker(): PolyAdapter.BindingDelegate<*, *>
   }
 
   @Module
-  object ProvidesModule {
-    @Provides
-    @JvmStatic
-    fun itemProvider(activity: SampleActivity): PolyAdapter.ItemProvider = activity.listProvider
-  }
+  abstract class ContribModule {
 
-  @Module
-  abstract class BindingModule {
-    @ContributesAndroidInjector(modules = [
-      DelegatesModule::class,
-      ProvidesModule::class
-    ])
+    @ActivityScope
+    @ContributesAndroidInjector(modules = [AdapterModule::class])
     abstract fun contributeInjector(): SampleActivity
   }
 }
 
+@Scope
+annotation class ActivityScope

@@ -1,12 +1,9 @@
-package polyadapter.sample.delegates
+package polyadapter.sample
 
 import android.view.View
-import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import polyadapter.PolyAdapter
 import polyadapter.equalityItemCallback
-import polyadapter.sample.R
-import polyadapter.sample.data.DividerLine
-import polyadapter.sample.viewholder.DividerHolder
 import javax.inject.Inject
 
 class DividerDelegate @Inject constructor() : PolyAdapter.BindingDelegate<DividerLine, DividerHolder> {
@@ -18,3 +15,6 @@ class DividerDelegate @Inject constructor() : PolyAdapter.BindingDelegate<Divide
   override fun bindView(holder: DividerHolder, item: DividerLine) {}
 }
 
+class DividerHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+
+class DividerLine

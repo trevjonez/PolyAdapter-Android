@@ -127,7 +127,7 @@ or if you want to customize the identity check:
 ```kotlin
 override val itemCallback = equalityItemCallback<String> { hashCode() }
 ```
-but if your usecase demands more fine grade control, provide a completely custom implementation of [`DiffUtil.ItemCallback`](https://developer.android.com/reference/android/support/v7/util/DiffUtil.ItemCallback).
+but if your usecase demands more fine grain control, provide a completely custom implementation of [`DiffUtil.ItemCallback`](https://developer.android.com/reference/android/support/v7/util/DiffUtil.ItemCallback).
 
 
 This leaves us with two methods left to implement:

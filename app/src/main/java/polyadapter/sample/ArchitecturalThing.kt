@@ -1,20 +1,16 @@
 package polyadapter.sample
 
 import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.rx2.asFlow
 import polyadapter.provider.PagedListProvider
-import polyadapter.sample.data.CategoryTitle
-import polyadapter.sample.data.DividerLine
-import polyadapter.sample.data.Movie
 import javax.inject.Inject
 
 /**
- * place holder for VM/Presenter/etc...
+ * place holder for VM/Repo/etc...
  */
 class ArchitecturalThing @Inject constructor() {
-  fun dataSource(): Observable<List<Any>> {
+  fun rxDataSource(): Observable<List<Any>> {
     return Observable.just(listOf(
       CategoryTitle("The Hobbit"),
       Movie("An Unexpected Journey",
@@ -40,20 +36,13 @@ class ArchitecturalThing @Inject constructor() {
       Movie("The Return of the King",
         "https://www.imdb.com/title/tt0167260/",
         "https://m.media-amazon.com/images/M/MV5BNzA5ZDNlZWMtM2NhNS00NDJjLTk4NDItYTRmY2EwMWZlMTY3XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_SY1000_CR0,0,675,1000_AL_.jpg"),
-      DividerLine()
-    ))
+      DividerLine(),
+      CategoryTitle("Flow Tickers")
+    ) + (0..42).flatMap { listOf(Ticker(), DividerLine()) }) // big enough count of items to validate scope behavior on the ScopedDelegate as well as check for memory leaks
   }
 
-  fun fastSource(): Observable<List<Any>> {
-    return Observable.range(0, 10000)
-      .flatMapSingle {
-        Single.fromCallable {
-          (0 until 100).map<Int, Any> { DividerLine() }
-        }
-          .subscribeOn(Schedulers.computation())
-      }
-      .observeOn(AndroidSchedulers.mainThread())
-  }
+  fun flowDataSource(): Flow<List<Any>> =
+    rxDataSource().asFlow()
 
   /**
    * Ignore this, it is here just to help me verify proguard config rules that are packed into the paging AAR

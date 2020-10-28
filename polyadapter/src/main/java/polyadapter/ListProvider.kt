@@ -16,7 +16,7 @@ class ListProvider(defaultItems: List<Any> = emptyList()) : PolyAdapter.ItemProv
   @Module
   abstract class AsItemProvider {
     @Binds
-    abstract fun itemProvider(impl: ListProvider): PolyAdapter.ItemProvider
+    abstract fun ListProvider.itemProvider(): PolyAdapter.ItemProvider
   }
 
   private lateinit var listUpdateCallback: ListUpdateCallback
@@ -38,11 +38,11 @@ class ListProvider(defaultItems: List<Any> = emptyList()) : PolyAdapter.ItemProv
    * The result of the diff calculation function will return a function that is then used to apply
    * the diff util result and swap the list within the adapter.
    */
-  fun updateItems(newItems: List<Any>): () -> (() -> Unit) {
+  fun updateItems(newItems: List<Any>, detectMoves: Boolean = true): DiffWork {
     check(onMainThread()) { "DiffResult Worker must be created on the main thread." }
 
     val oldItems = items
-    return {
+    return DiffWork {
       if (onMainThread())
         Log.w(
           "ListProvider",
@@ -62,21 +62,19 @@ class ListProvider(defaultItems: List<Any> = emptyList()) : PolyAdapter.ItemProv
 
         override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int) =
           itemCallback.getChangePayload(oldItems[oldItemPosition], newItems[newItemPosition])
-      }, true)
+      }, detectMoves)
 
-      val swapDataAndDispatchDiffResult: () -> Unit = {
+      ApplyDiffResult {
         check(onMainThread()) { "Data swap and diffResult dispatching must be called from the main thread" }
         if (items !== oldItems) {
           Log.w("ListProvider", "Inconsistent ordering of diff result application detected.\n" +
             "Trying to apply result of comparison Base@${identityHashCode(oldItems)} -> Head@${identityHashCode(newItems)}\n" +
-            "to Base@${identityHashCode(items)}, ")
+            "to Base@${identityHashCode(items)}, data and diffResult will not be applied.")
         } else {
           items = newItems
           diffResult.dispatchUpdatesTo(listUpdateCallback)
         }
       }
-
-      swapDataAndDispatchDiffResult
     }
   }
 

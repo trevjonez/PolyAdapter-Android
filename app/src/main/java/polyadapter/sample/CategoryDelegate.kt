@@ -1,12 +1,10 @@
-package polyadapter.sample.delegates
+package polyadapter.sample
 
 import android.view.View
-import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import polyadapter.PolyAdapter
 import polyadapter.equalityItemCallback
-import polyadapter.sample.R
-import polyadapter.sample.data.CategoryTitle
-import polyadapter.sample.viewholder.CategoryHolder
+import polyadapter.sample.databinding.CategoryItemBinding
 import javax.inject.Inject
 
 class CategoryDelegate @Inject constructor() : PolyAdapter.BindingDelegate<CategoryTitle, CategoryHolder> {
@@ -23,3 +21,14 @@ class CategoryDelegate @Inject constructor() : PolyAdapter.BindingDelegate<Categ
   }
 }
 
+class CategoryHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+  private val binding = CategoryItemBinding.bind(itemView)
+
+  fun setTitleText(charSequence: CharSequence) {
+    binding.headerText.text = charSequence
+  }
+}
+
+data class CategoryTitle(
+  val text: CharSequence
+)
