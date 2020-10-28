@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package polyadapter
 
 import androidx.recyclerview.widget.DiffUtil
@@ -13,7 +15,7 @@ class ListProviderTest {
     val itemCallback = ItemCallbackFake()
     provider.onAttach(listCallback, itemCallback)
 
-    provider.updateItems(listOf(1, 2, 3))()
+    provider.updateItems(listOf(1, 2, 3)).run()
 
     Truth.assertThat(itemCallback.itemSameInvocations).hasSize(6)
     Truth.assertThat(itemCallback.contentsSameInvocations).hasSize(3)
@@ -27,7 +29,7 @@ class ListProviderTest {
     val itemCallback = ItemCallbackFake()
     provider.onAttach(listCallback, itemCallback)
 
-    provider.updateItems(listOf(3, 2, 1))()()
+    provider.updateItems(listOf(3, 2, 1)).run()()
 
     Truth.assertThat(listCallback.movedInvocations).hasSize(2)
   }
@@ -40,7 +42,7 @@ class ListProviderTest {
     provider.onAttach(listCallback, itemCallback)
 
 
-    val effector = provider.updateItems(listOf(3, 2, 1))()
+    val effector = provider.updateItems(listOf(3, 2, 1)).run()
 
     Truth.assertThat(listCallback.totalInvocations).isEqualTo(0)
     effector()

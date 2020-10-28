@@ -14,17 +14,17 @@ fun interface ApplyDiffResult{
  * That is also a factory of the action that applies the result.
  */
 fun interface DiffWork {
-  operator fun invoke(): ApplyDiffResult
-}
-
-fun interface SuspendingDiffWork {
-  suspend operator fun invoke(): ApplyDiffResult
+  fun run(): ApplyDiffResult
 }
 
 fun interface DiffWorkFactory {
-  operator fun invoke(newItems: List<Any>): DiffWork
+  fun create(newItems: List<Any>): DiffWork
+}
+
+interface SuspendingDiffWork {
+  suspend fun run(): ApplyDiffResult
 }
 
 fun interface SuspendingDiffWorkFactory {
-  operator fun invoke(newItems: List<Any>): SuspendingDiffWork
+  fun create(newItems: List<Any>): SuspendingDiffWork
 }

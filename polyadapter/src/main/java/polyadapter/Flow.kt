@@ -12,7 +12,7 @@ suspend fun ListProvider.calculateDiff(
   dispatcher: CoroutineDispatcher = Dispatchers.Default
 ): ApplyDiffResult {
   val diffWork = updateItems(newList, detectMoves)
-  return withContext(dispatcher) { diffWork() }
+  return withContext(dispatcher) { diffWork.run() }
 }
 
 @ExperimentalCoroutinesApi
@@ -21,13 +21,20 @@ fun Flow<List<Any>>.diffUtil(
   detectMoves: Boolean = true,
   dispatcher: CoroutineDispatcher = Dispatchers.Default
 ): Flow<ApplyDiffResult> = diffUtil { newList ->
-  SuspendingDiffWork { listProvider.calculateDiff(newList, detectMoves, dispatcher) }
+  object : SuspendingDiffWork {
+    override suspend fun run(): ApplyDiffResult {
+      return listProvider.calculateDiff(newList, detectMoves, dispatcher)
+    }
+  }
 }
 
 @ExperimentalCoroutinesApi
 fun Flow<List<Any>>.diffUtil(
   diffWorkFactory: SuspendingDiffWorkFactory
-): Flow<ApplyDiffResult> = transformLatest { emit(diffWorkFactory(it)()) }
+): Flow<ApplyDiffResult> = transformLatest { newList ->
+  val diffResult = diffWorkFactory.create(newList).run()
+  emit(diffResult)
+}
 
 /**
  * [PolyAdapter.BindingDelegate] that has its own scope as well as a scope per holder.

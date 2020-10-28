@@ -25,8 +25,8 @@ class DiffUtilTransformer(
 
   override fun apply(upstream: Observable<List<Any>>): ObservableSource<ApplyDiffResult> {
     return upstream.switchMap { newList ->
-      val diffWork = diffWorkFactory(newList)
-      Observable.fromCallable { diffWork() }
+      val diffWork = diffWorkFactory.create(newList)
+      Observable.fromCallable(diffWork::run)
         .subscribeOn(workScheduler)
         .observeOn(mainScheduler)
     }
