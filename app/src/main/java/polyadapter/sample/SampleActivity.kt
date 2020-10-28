@@ -1,6 +1,7 @@
 package polyadapter.sample
 
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -10,8 +11,11 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import polyadapter.ListProvider
 import polyadapter.PolyAdapter
+import polyadapter.diffUtil
 import polyadapter.provider.diffUtil
 import polyadapter.sample.databinding.SampleActivityBinding
 import javax.inject.Inject
@@ -44,10 +48,19 @@ class SampleActivity : DaggerAppCompatActivity() {
     // or
     viewBinding.recycler.adapter = polyAdapterFactory.build(listProvider)
 
-    archThing.dataSource() //grab your data source
+    // rx data source
+    archThing.rxDataSource() //grab your data source
       .diffUtil(listProvider) //pipe it into the list provider to calculate diff result
       .subscribe { it() } //apply the new list and diff result when you are ready
       .addTo(createDisposables)
+
+    // or
+
+    // coroutines flow data source
+    archThing.flowDataSource() //grab your data source
+      .diffUtil(listProvider) //pipe it into the list provider to calculate diff result
+      .onEach { it() } //apply the new list and diff result when you are ready
+      .launchIn(lifecycleScope)
   }
 
   override fun onDestroy() {

@@ -20,10 +20,15 @@ import java.lang.System.identityHashCode
 import java.util.*
 import javax.inject.Inject
 
+/**
+ * Example of using a scoped delegate to manage coroutine jobs within the bounds
+ * of a view holders lifecycle. Using the provided default implementation of a [ScopedDelegate]
+ */
 class TickerDelegate @Inject constructor(
   hostLifecycle: Lifecycle
 ) : PolyAdapter.BindingDelegate<Ticker, TickerHolder>,
   ScopedDelegate by default(hostLifecycle.coroutineScope) {
+
   override val layoutId = R.layout.ticker_item
   override val dataType = Ticker::class.java
   override val itemCallback: DiffUtil.ItemCallback<Ticker> = equalityItemCallback()

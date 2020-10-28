@@ -4,7 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import coil.api.load
+import coil.load
 import polyadapter.PolyAdapter
 import polyadapter.equalityItemCallback
 import polyadapter.sample.databinding.MovieItemBinding

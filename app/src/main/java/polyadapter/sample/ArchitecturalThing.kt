@@ -1,6 +1,8 @@
 package polyadapter.sample
 
 import io.reactivex.Observable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.rx2.asFlow
 import polyadapter.provider.PagedListProvider
 import javax.inject.Inject
 
@@ -8,7 +10,7 @@ import javax.inject.Inject
  * place holder for VM/Repo/etc...
  */
 class ArchitecturalThing @Inject constructor() {
-  fun dataSource(): Observable<List<Any>> {
+  fun rxDataSource(): Observable<List<Any>> {
     return Observable.just(listOf(
       CategoryTitle("The Hobbit"),
       Movie("An Unexpected Journey",
@@ -38,6 +40,9 @@ class ArchitecturalThing @Inject constructor() {
       CategoryTitle("Flow Tickers")
     ) + (0..42).flatMap { listOf(Ticker(), DividerLine()) }) // big enough count of items to validate scope behavior on the ScopedDelegate as well as check for memory leaks
   }
+
+  fun flowDataSource(): Flow<List<Any>> =
+    rxDataSource().asFlow()
 
   /**
    * Ignore this, it is here just to help me verify proguard config rules that are packed into the paging AAR
