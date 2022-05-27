@@ -226,3 +226,9 @@ recyclerViewTwo.apply {
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+## Notes on the future
+
+I still think the main thing google got wrong with recycle view is that they allowed things to become too fuzzy, optional, and/or coupled. Loading items and binding data to views should not have been put inside a single type. This library I have always seen as a way to force implementations to acqknowledge the elements of the recycler view API's to make the system work as I think it was intended. Load -> diff -> incrementally bind. I started working on a coroutines version of the API's some time ago as I was retraining my brain to think in `suspend fun` rather than `Subscribe`/`Disposable`. That said I don't know how widely this library is used in industry. The way compose exposes the option of setting keys on lazy lists/columns I believe implicitly captures the load/diff/bind pattern that was arduous before and is now mostly compiler intrinsic (how we can assume it is the right way to go forward?). 
+
+I am willing to support community needs on the project as time allows, but I suspect the need for it will be brief and rapidly diminishing.
